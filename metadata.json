@@ -1,0 +1,8 @@
+{
+  "name": "CorgiWalk",
+  "description": "Plataforma web e API REST para passeios seguros com cachorro Corgi, alertas climáticos por CEP, monitoramento de duração e gasto calórico.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

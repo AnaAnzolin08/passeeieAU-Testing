@@ -1,0 +1,375 @@
+openapi: 3.0.3
+info:
+  title: PasseieAu API
+  version: 1.0.0
+  description: |
+    API REST da plataforma **PasseieAu** para gerenciamento de passeios seguros com seu cachorro.
+    Documentação focada exclusivamente nas 4 funcionalidades da aplicação: **Login**, **Cadastro**, **Passeio** e **Finalização**,
+    com banco de dados em memória no estilo `mongodb-memory-server`.
+
+    **Como testar os endpoints protegidos no Swagger UI:**
+    1. Execute `POST /api/login` (ou `POST /api/cadastro`) e copie o campo `token` retornado.
+    2. Clique em **Authorize** no topo direito e cole apenas o token (sem o prefixo `Bearer`).
+    3. Execute `POST /api/passeio`, copie o `_id` retornado e finalize em `POST /api/finalizacao`.
+servers:
+  - url: /
+    description: Servidor atual (mesma origem)
+  - url: http://localhost:3000
+    description: Servidor local
+tags:
+  - name: Login
+    description: Autenticação do tutor e verificação climática automática por CEP
+  - name: Cadastro
+    description: Cadastro de novo tutor, cachorro e foto do pet
+  - name: Passeio
+    description: Início de passeio com trava preventiva contra chuva ou calor excessivo (≥ 29°C) e alerta de atenção redobrada (26°C a 28°C)
+  - name: Finalização
+    description: Encerramento do passeio, cálculo calórico e histórico do tutor
+paths:
+  /api/login:
+    post:
+      tags:
+        - Login
+      operationId: loginTutor
+      summary: Login do tutor e diagnóstico climático por CEP
+      description: Autentica o tutor com e-mail e senha, emite um token Bearer HMAC-SHA256 e consulta o clima atual do CEP cadastrado.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login realizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Credenciais inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Login ou senha incorretos.
+  /api/cadastro:
+    post:
+      tags:
+        - Cadastro
+      operationId: cadastrarTutorPet
+      summary: Cadastro de tutor e cachorro
+      description: Registra um novo tutor e pet no banco em memória, valida o formato do e-mail e CEP e retorna o token Bearer com o relatório climático.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Tutor e pet cadastrados com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Campos obrigatórios ausentes ou inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: 'Preencha todos os campos obrigatórios: tutorName, login, password, dogName e cep.'
+        '409':
+          description: E-mail de login já cadastrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Este login já está em uso.
+  /api/passeio:
+    post:
+      tags:
+        - Passeio
+      operationId: iniciarPasseio
+      summary: Inicia um passeio após validar ausência de chuva ou calor ≥ 29°C no CEP
+      description: Utiliza o CEP do tutor autenticado via Bearer Token para validar as condições climáticas. Entre 26°C e 28°C libera com alerta de atenção redobrada; em chuva ou temperatura ≥ 29°C bloqueia com HTTP 403.
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Passeio iniciado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Walk'
+        '400':
+          description: CEP inválido no cadastro do tutor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: CEP não encontrado ou inválido. Informe 8 dígitos.
+        '403':
+          description: Início do passeio bloqueado por previsão de chuva ou calor ≥ 29°C no CEP
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: 'Alerta de Tempo Chuvoso: A chuva aumenta o risco de hipotermia, quedas em pisos escorregadios, sustos com trovoadas e dermatites por umidade nas patas e pelagem. Mantenha seu cachorro em local seco e protegido e aguarde o tempo firmar. O início do passeio foi bloqueado preventivamente.'
+  /api/finalizacao:
+    post:
+      tags:
+        - Finalização
+      operationId: finalizarPasseio
+      summary: Finaliza um passeio em andamento e calcula calorias gastas
+      description: Encerra o passeio pertencente ao tutor autenticado, calcula o gasto calórico na taxa de 4.2 kcal/min a partir de `durationSeconds` e retorna o histórico atualizado.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinishWalkRequest'
+      responses:
+        '200':
+          description: Passeio finalizado com resumo e histórico atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinishWalkResponse'
+        '400':
+          description: Identificador ou duração inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Informe uma duração inteira válida em segundos (>= 1).
+    get:
+      tags:
+        - Finalização
+      operationId: consultarHistoricoFinalizacoes
+      summary: Lista o histórico e total de calorias dos passeios finalizados
+      description: Retorna apenas os passeios concluídos (`completed`) do tutor autenticado e o somatório de passeios, duração e calorias.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Histórico de passeios concluídos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalkHistoryResponse'
+        '401':
+          description: Não autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Token de autenticação ausente.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: HMAC-SHA256
+      description: Token retornado em POST /api/login ou POST /api/cadastro.
+  schemas:
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          example: Login ou senha incorretos.
+    LoginRequest:
+      type: object
+      required:
+        - login
+        - password
+      properties:
+        login:
+          type: string
+          format: email
+          example: ana@passeieau.com
+        password:
+          type: string
+          example: corgi123
+    RegisterRequest:
+      type: object
+      required:
+        - tutorName
+        - login
+        - password
+        - dogName
+        - cep
+      properties:
+        tutorName:
+          type: string
+          example: Maria Clara
+        login:
+          type: string
+          format: email
+          example: maria@passeieau.com
+        password:
+          type: string
+          minLength: 4
+          example: senha123
+        dogName:
+          type: string
+          example: Bento
+        cep:
+          type: string
+          example: '01310-100'
+        dogPhoto:
+          type: string
+          example: /src/assets/images/corgi_avatar_biscoito_1795046208844.jpg
+    FinishWalkRequest:
+      type: object
+      required:
+        - walkId
+        - durationSeconds
+      properties:
+        walkId:
+          type: string
+          description: Identificador (_id) do passeio iniciado em POST /api/passeio
+          example: 6740a1b2c3d4e5f600000301
+        durationSeconds:
+          type: integer
+          minimum: 1
+          description: Duração total do passeio em segundos (inteiro >= 1)
+          example: 1500
+    UserPublic:
+      type: object
+      properties:
+        _id:
+          type: string
+        login:
+          type: string
+        tutorName:
+          type: string
+        dogName:
+          type: string
+        dogPhoto:
+          type: string
+        cep:
+          type: string
+        role:
+          type: string
+          example: client
+        createdAt:
+          type: string
+          format: date-time
+    WeatherReport:
+      type: object
+      properties:
+        cep:
+          type: string
+          example: '01310-100'
+        cityLabel:
+          type: string
+          example: São Paulo, SP
+        condition:
+          type: string
+          example: Parcialmente nublado
+        temperatureC:
+          type: number
+          example: 23
+        hasRain:
+          type: boolean
+        excessiveHeat:
+          type: boolean
+        canWalk:
+          type: boolean
+        heatWarning:
+          type: string
+          nullable: true
+        rainBlockMessage:
+          type: string
+          nullable: true
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: '#/components/schemas/UserPublic'
+        weather:
+          $ref: '#/components/schemas/WeatherReport'
+    Walk:
+      type: object
+      properties:
+        _id:
+          type: string
+        userId:
+          type: string
+        userLogin:
+          type: string
+        tutorName:
+          type: string
+        dogName:
+          type: string
+        cep:
+          type: string
+        weatherSummary:
+          type: string
+        temperatureC:
+          type: number
+        hasRain:
+          type: boolean
+        excessiveHeat:
+          type: boolean
+        status:
+          type: string
+          enum:
+            - in_progress
+            - completed
+        startedAt:
+          type: string
+          format: date-time
+        finishedAt:
+          type: string
+          format: date-time
+          nullable: true
+        durationSeconds:
+          type: integer
+        caloriesBurned:
+          type: number
+    WalkHistoryTotals:
+      type: object
+      properties:
+        totalWalks:
+          type: integer
+        totalDurationSeconds:
+          type: integer
+        totalCaloriesBurned:
+          type: number
+    WalkHistoryResponse:
+      type: object
+      properties:
+        walks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Walk'
+        totals:
+          $ref: '#/components/schemas/WalkHistoryTotals'
+    FinishWalkResponse:
+      type: object
+      properties:
+        walk:
+          $ref: '#/components/schemas/Walk'
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/Walk'
+        totals:
+          $ref: '#/components/schemas/WalkHistoryTotals'
