@@ -67,14 +67,6 @@ Ao iniciar o servidor, o banco de dados em memória cria automaticamente **3 usu
 | Bruno Mendes | `bruno@passeieau.com` | `passeio123` | Pipoca | `40140-110` (Salvador, BA) | Calor intenso — exibe alerta de calor excessivo |
 | Carla Souza | `carla@passeieau.com` | `chuva123` | Pudim | `80010-000` (Curitiba, PR) | Previsão de chuva (fallback) — bloqueia início do passeio |
 
-### Produtos pré-cadastrados (3)
-
-| Produto | Categoria | Preço |
-| :--- | :--- | :--- |
-| Coleira Refrescante Corgi Fit | Conforto Térmico | R$ 129,90 |
-| Peitoral Anatômico Anti-Puxão | Segurança | R$ 169,00 |
-| Garrafa Portátil Hidratação 500ml | Hidratação | R$ 74,50 |
-
 ---
 
 ## 5. Quais são as regras de negócio
