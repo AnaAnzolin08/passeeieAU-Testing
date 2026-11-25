@@ -63,7 +63,7 @@ Ao iniciar o servidor, o banco de dados em memória cria automaticamente **3 usu
 
 | Tutor | E-mail (Login) | Senha | Cachorro | CEP | Cenário Climático Típico |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| Ana Paula | `ana@passeieau.com` | `corgi123` | Biscoito | `01310-100` (São Paulo, SP) | Clima ameno — passeio liberado |
+| Ana  | `ana@passeieau.com` | `corgi123` | Biscoito | `01310-100` (São Paulo, SP) | Clima ameno — passeio liberado |
 | Bruno Mendes | `bruno@passeieau.com` | `passeio123` | Pipoca | `40140-110` (Salvador, BA) | Calor intenso — exibe alerta de calor excessivo |
 | Carla Souza | `carla@passeieau.com` | `chuva123` | Pudim | `80010-000` (Curitiba, PR) | Previsão de chuva (fallback) — bloqueia início do passeio |
 
