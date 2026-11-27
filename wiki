@@ -1,0 +1,451 @@
+# PasseieAu
+
+ Documentacao do projeto
+
+PasseieAu e uma aplicacao full-stack para planejar e acompanhar passeios com cachorros com seguranca. O sistema considera autenticacao, cadastro do tutor e do animal, clima local e historico dos passeios.
+
+## Tecnologias
+
+- Node.js
+- Express
+- TypeScript
+- React
+- Vite
+- Tailwind CSS
+- Cypress
+- Mocha e Supertest
+- k6
+
+## Funcionalidades
+
+- Cadastro e login de usuarios.
+- Validacao de dados do tutor e do animal.
+- Consulta das condicoes climaticas por CEP.
+- Bloqueio de passeios em caso de chuva ou calor excessivo.
+- Inicio, pausa, continuidade e finalizacao de passeios.
+- Registro de horario de inicio e termino.
+- Historico detalhado dos passeios.
+- Calculo e exibicao de calorias gastas.
+- Grafico com o resumo dos passeios.
+
+## Requisitos
+
+- Node.js 20 ou superior
+- npm
+- k6, para os testes de desempenho
+
+## Instalacao
+npm install
+```
+
+## Executando o projeto
+
+npm run dev
+```
+
+A aplicacao sera disponivel em `http://localhost:3000`.
+
+## Documentacao da API (Swagger)
+
+Com o servidor em execucao (`npm run dev`), acesse a interface interativa do Swagger em:
+
+`http://localhost:3000/docs` (tambem disponivel em `http://localhost:3000/api/docs`)
+
+A especificacao OpenAPI pode ser consultada em formato YAML por `http://localhost:3000/api/swagger.yaml` ou em JSON por `http://localhost:3000/api/openapi.json`. O arquivo-fonte da especificacao esta em [swagger.yaml](swagger.yaml).
+
+Para o ambiente de producao:
+
+
+npm run build
+npm start
+```
+
+## Scripts disponiveis
+
+| Comando | Descricao |
+|---|---|
+| `npm run dev` | Inicia o servidor em modo de desenvolvimento |
+| `npm run build` | Gera a versao de producao |
+| `npm start` | Inicia o servidor em modo de producao |
+| `npm run lint` | Executa a verificacao de tipos |
+| `npm test` | Executa os testes unitarios e de API |
+| `npm run cypress:open` | Abre a interface do Cypress |
+| `npm run cypress:run` | Executa os testes E2E no terminal |
+
+## Testes
+
+### Testes unitarios e de API
+
+```powershell
+npm test
+```
+
+### Testes E2E
+
+Com a aplicacao em execucao:
+
+```powershell
+npm run cypress:run
+```
+
+Para abrir o Cypress em modo visual:
+
+
+npm run cypress:open
+```
+
+### Testes de desempenho com K6
+
+Com a aplicacao em execucao:
+
+$env:K6_WEB_DASHBOARD="true"
+$env:K6_WEB_DASHBOARD_EXPORT="html-report.html"
+k6 
+run ./cypres/performece/passeio_test.js
+>>>>>>> 00b2a1b (Primeiro commit)
+
+O teste valida o endpoint `/api/health` e gera o relatorio `html-report.html`.
+
+## Regras de negocio
+
+### RN01 - Login e autenticacao
+O sistema permite o acesso somente com e-mail e senha validos. Credenciais incorretas devem apresentar uma mensagem de erro e impedir o acesso.
+
+### RN02 - Cadastro de usuario
+O cadastro somente deve ser realizado quando todos os campos obrigatorios estiverem preenchidos corretamente. O CEP informado deve ser valido e seguir o formato esperado.
+
+### RN03 - Validacao do clima - chuva
+Antes de permitir o passeio, o sistema consulta as condicoes climaticas. Caso seja identificada previsao de chuva, o passeio deve ser bloqueado preventivamente e uma mensagem deve ser apresentada ao usuario.
+
+### RN04 - Validacao da temperatura
+O sistema bloqueia passeios quando a temperatura estiver acima de 27 °C no periodo das 9h as 16h.
+### RN05 - Inicio do passeio
+O sistema permite iniciar um passeio somente apos as validacoes de autenticacao, cadastro e clima serem aprovadas. O horario de inicio deve ser registrado.
+
+### RN06 - Finalizacao do passeio - Historico
+O sistema permite finalizar um passeio iniciado, registrando o horario de termino e atualizando o status para finalizado.
+
+### RN07 - Historico de passeios
+O sistema disponibiliza o bloqueio da alta temperatura,então o tutor não consegue inicar o passeio com seu pet , ele mostra alerta. 
+
+## Estrutura principal
+
+```text
+src/
+  components/
+  pages/
+test/
+cypress/
+  e2e/
+  performece/
+  support/
+server.ts
+documentacao.Md
+```
+
+## Documentacao adicional
+- Regras de negocio e casos de teste: [documentacao.Md](documentacao.Md)
+- Relatorio de desempenho: [html-report.html](html-report.html)
+
+
+
+# Documentação de Testes – PasseieAu
+
+Documentação funcional e técnica de testes do sistema **PasseieAu**, estruturada com base na norma **ISO/IEC/IEEE 29119-3**, contemplando Regras de Negócio, Técnicas de Caixa-Preta (Partição por Classes de Equivalência, Análise de Valor Limite e Tabela de Decisão) e Casos de Teste detalhados.
+
+---
+
+## Sumário
+
+1. [Regras de Negócio](#1-regras-de-negócio)
+2. [Partição por Classes de Equivalência](#2-partição-por-classes-de-equivalência)
+3. [Análise de Valor Limite](#3-análise-de-valor-limite)
+4. [Tabela de Decisão – Início do Passeio](#4-tabela-de-decisão--início-do-passeio)
+5. [Casos de Teste Detalhados (ISO/IEC/IEEE 29119-3)](#5-casos-de-teste-detalhados-isoiecieee-29119-3)
+   - [Fluxos Principais, Pausas, Histórico e Regras Climáticas (CT-001 a CT-013)](#fluxos-principais-pausas-histórico-e-regras-climáticas-ct-001-a-ct-013)
+   - [Casos de Teste Complementares – Fronteiras, Exceções e API (CT-014 a CT-028)](#casos-de-teste-complementares--fronteiras-exceções-e-api-ct-014-a-ct-028)
+
+---
+
+## 1. Regras de Negócio
+
+| ID | Título | Descrição |
+| :--- | :--- | :--- |
+| **RN01** | **Login e autenticação** | O sistema deve permitir o acesso somente com e-mail e senha válidos. Caso as credenciais estejam incorretas, deverá apresentar uma mensagem de erro e impedir o acesso. |
+| **RN02** | **Cadastro de usuário** | O sistema deve permitir o cadastro somente quando todos os campos obrigatórios estiverem preenchidos corretamente. O CEP informado deve ser válido e seguir o formato esperado. |
+| **RN03** | **Validação do clima – Chuva** | Antes de permitir o passeio, o sistema deve consultar as condições climáticas. Caso seja identificada previsão de chuva, o passeio deverá ser bloqueado preventivamente, apresentando uma mensagem ao usuário. |
+| **RN04** | **Validação de temperatura** | O sistema deve bloquear passeios quando a temperatura estiver acima de 27 °C, exclusivamente no período das 9h às 16h, como medida preventiva de segurança. |
+| **RN05** | **Início do passeio** | O sistema deve permitir o início do passeio somente quando todas as validações obrigatórias forem aprovadas, incluindo autenticação, cadastro e condições climáticas. O horário de início deverá ser registrado. |
+| **RN06** | **Finalização do passeio** | O sistema deve permitir a finalização de um passeio iniciado, registrando o horário de término e atualizando seu status para finalizado. |
+| **RN07** | **Histórico de passeios** | O sistema deve disponibilizar o histórico dos passeios realizados, apresentando informações como data, horário de início, horário de término e status do passeio. |
+
+---
+
+## 2. Partição por Classes de Equivalência
+
+| Funcionalidade | Classe válida | Classe inválida |
+| :--- | :--- | :--- |
+| **Login** | E-mail e senha corretos de um usuário cadastrado | E-mail inexistente, senha incorreta, campos vazios ou e-mail fora do formato |
+| **Cadastro** | Todos os campos obrigatórios preenchidos, e-mail válido, senha com 4 a 128 caracteres e CEP com 8 dígitos válido | Campo obrigatório vazio, e-mail inválido, senha fora do intervalo, CEP inválido e login duplicado |
+| **Temperatura** | Temperatura até 27 °C ou acima de 27 °C fora do período bloqueado | Temperatura acima de 27 °C entre 09:00 e antes das 16:00 |
+| **Chuva** | Sem chuva | Previsão de chuva em qualquer temperatura ou horário |
+| **Duração do passeio** | Número inteiro maior ou igual a 1 segundo | Número menor que 1, número decimal, texto ou campo ausente |
+| **Autorização** | Token válido do tutor proprietário do passeio | Token ausente, inválido ou passeio pertencente a outro usuário |
+
+---
+
+## 3. Análise de Valor Limite
+
+### 3.1 Senha
+
+| Tipo de limite | Valor | Resultado esperado |
+| :--- | :--- | :--- |
+| Abaixo do mínimo | 3 caracteres | Cadastro rejeitado com HTTP 400 |
+| Limite mínimo | 4 caracteres | Cadastro aceito |
+| Entre os limites | 128 caracteres | Cadastro aceito |
+| Acima do máximo | 129 caracteres | Cadastro rejeitado com HTTP 400 |
+
+### 3.2 CEP
+
+| Tipo de limite | Valor | Resultado esperado |
+| :--- | :--- | :--- |
+| Abaixo do tamanho | `01310-10` / 7 dígitos | CEP inválido; HTTP 400 no cadastro |
+| Limite válido | `01310100` / 8 dígitos válidos | CEP aceito e consulta climática realizada |
+| Acima do tamanho | `013101000` / 9 dígitos | CEP inválido; HTTP 400 no cadastro |
+| CEP composto por zeros | `00000-000` | CEP inválido; HTTP 400 no cadastro |
+| Caracteres não numéricos | `ABCDE-FGH` | CEP inválido; apenas 8 dígitos são aceitos |
+
+### 3.3 Temperatura (Período de 09:00 às 15:59)
+
+| Tipo de limite | Valor | Resultado esperado |
+| :--- | :--- | :--- |
+| Logo abaixo do limite | 26,9 °C | Passeio permitido |
+| Valor limite | 27,0 °C | Passeio permitido |
+| Primeiro valor acima do limite | 27,1 °C | Passeio bloqueado |
+
+### 3.4 Horário de Bloqueio por Calor
+
+| Tipo de limite | Horário | Temperatura (> 27 °C) | Resultado esperado |
+| :--- | :--- | :--- | :--- |
+| Antes do período | 08:59 | 28,0 °C | Permitido, com alerta de cautela |
+| Início do período | 09:00 | 28,0 °C | Bloqueado |
+| Dentro do período | 15:59 | 28,0 °C | Bloqueado |
+| Fim do período | 16:00 | 28,0 °C | Permitido, com alerta de cautela |
+| Fora do período | 18:00 | 28,0 °C | Permitido, com alerta de cautela |
+
+### 3.5 Duração do Passeio
+
+| Tipo de limite | Valor em segundos | Resultado esperado |
+| :--- | :--- | :--- |
+| Abaixo do mínimo | 0 | Finalização rejeitada com HTTP 400 |
+| Limite mínimo | 1 | Finalização aceita |
+| Valor válido | 1500 | Finalização aceita; 105 calorias para o cálculo atual |
+| Valor decimal | 1,5 | Finalização rejeitada com HTTP 400 |
+
+---
+
+## 4. Tabela de Decisão – Início do Passeio
+
+**Objetivo:** Validar se o sistema permite ou bloqueia o início do passeio conforme autenticação, previsão de chuva, temperatura e horário.
+
+| Regra / Condição | R1 | R2 | R3 | R4 | R5 | R6 |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Usuário autenticado** | S | S | S | S | S | N |
+| **Há previsão de chuva** | N | S | N | S | N | - |
+| **Temperatura > 27 °C** | N | N | S | S | S | - |
+| **Horário entre 09:00 e antes das 16:00** | - | - | S | S | N | - |
+| **Ações esperadas** | Inicia o passeio | Bloqueia por chuva | Bloqueia por calor | Bloqueia por chuva | Permite com alerta | Negar acesso |
+| **Status esperado** | HTTP 201 | HTTP 403 | HTTP 403 | HTTP 403 | HTTP 201 | HTTP 401 |
+
+> **Legenda:** `S` = Sim | `N` = Não | `-` = Não aplicável.
+>
+> **Observações:**
+> - A chuva tem prioridade sobre o bloqueio por calor.
+> - Até 27,0 °C não caracteriza calor excessivo.
+> - A partir de 27,1 °C, o bloqueio depende do período das 09:00 às 15:59.
+> - O horário das 16:00 não pertence ao período bloqueado.
+> - Quando a temperatura está acima de 27 °C fora do período bloqueado, o sistema deve permitir o passeio e apresentar alerta de cautela.
+
+---
+
+## 5. Casos de Teste Detalhados (ISO/IEC/IEEE 29119-3)
+
+### Fluxos Principais, Pausas, Histórico e Regras Climáticas (CT-001 a CT-013)
+
+#### CT-001 – Validar o login com e-mail e senha válidos
+
+- **Prioridade:** Alta
+- **Rastreabilidade:** RN01 – Login e autenticação
+- **Pré-condições:** Sistema disponível e usuário cadastrado no sistema.
+
+| Passo | Ação | Resultados Esperados |
+| :---: | :--- | :--- |
+| 1 | Clicar em "Cadastrar tutor e pet". | Tela de cadastro apresentada. |
+| 2 | Preencher os dados do tutor e do cachorro e concluir o cadastro. | Cadastro realizado com sucesso. |
+| 3 | Acessar a tela de login. | Tela "Entrar na conta do tutor" apresentada. |
+| 4 | Informar o e-mail e a senha válidos do usuário. | Campos preenchidos corretamente. |
+| 5 | Clicar no botão "Entrar e verificar clima". | Sistema autentica o usuário e apresenta o painel de monitoramento do passeio. |
+
+- **Pós-condições:** Usuário autenticado no sistema.
+- **Resultado obtido:** Tela de monitoramento exibida com o nome do tutor, nome do cachorro e login do usuário.
+- **Status:** ✅ Passou
+
+---
+
+#### CT-002 – Validar o login com senha inválida
+
+- **Prioridade:** Alta
+- **Rastreabilidade:** RN01 – Login e autenticação
+- **Pré-condições:** Sistema disponível e usuário cadastrado no sistema.
+
+| Passo | Ação | Resultados Esperados |
+| :---: | :--- | :--- |
+| 1 | Acessar a tela de login. | Tela "Entrar na conta do tutor" apresentada. |
+| 2 | Informar o e-mail válido do usuário. | E-mail preenchido no campo correspondente. |
+| 3 | Informar uma senha inválida. | Senha inválida preenchida no campo correspondente. |
+| 4 | Clicar em "Entrar e verificar clima". | Acesso negado e mensagem de erro apresentada. |
+| 5 | Verificar a permanência na tela de login. | Sistema mantém o usuário não autenticado. |
+
+- **Pós-condições:** Usuário permanece não autenticado na tela de login.
+- **Resultado obtido:** Mensagem de erro contendo "senha" exibida e tela de login mantida.
+- **Status:** ✅ Passou
+
+---
+
+#### CT-003 – Cadastrar um novo usuário com dados válidos
+
+- **Prioridade:** Alta
+- **Rastreabilidade:** RN02 – Cadastro de usuário
+- **Pré-condições:** Sistema disponível e usuário na tela inicial.
+
+| Passo | Ação | Resultados Esperados |
+| :---: | :--- | :--- |
+| 1 | Acessar a tela inicial e clicar em "Cadastrar tutor e pet". | Tela de cadastro apresentada. |
+| 2 | Informar nome do tutor, e-mail, senha, nome do cachorro e CEP válidos. | Campos obrigatórios preenchidos corretamente. |
+| 3 | Clicar em "Concluir cadastro do tutor e pet". | Sistema valida os dados informados. |
+| 4 | Aguardar o processamento do cadastro. | Cadastro realizado com sucesso. |
+| 5 | Verificar a apresentação da tela de login. | Campo de login e botão "Entrar e verificar clima" apresentados. |
+
+- **Pós-condições:** Tutor e cachorro cadastrados e usuário encaminhado para a tela de login.
+- **Resultado obtido:** Cadastro concluído e tela de login exibida.
+- **Status:** ✅ Passou
+
+---
+
+#### CT-004 – Validar o login do usuário recém-cadastrado
+
+- **Prioridade:** Alta
+- **Rastreabilidade:** RN01 – Login e autenticação / RN02 – Cadastro de usuário
+- **Pré-condições:** Usuário cadastrado com dados válidos e sistema disponível.
+
+| Passo | Ação | Resultados Esperados |
+| :---: | :--- | :--- |
+| 1 | Acessar a tela de login. | Tela "Entrar na conta do tutor" apresentada. |
+| 2 | Informar o e-mail e a senha usados no cadastro. | Campos preenchidos corretamente. |
+| 3 | Clicar em "Entrar e verificar clima". | Sistema valida as credenciais e consulta as informações climáticas do CEP. |
+| 4 | Aguardar o processamento do login. | Usuário autenticado com sucesso. |
+| 5 | Verificar o painel de monitoramento. | Painel exibido com o nome do cachorro, tutor e login cadastrados. |
+
+- **Pós-condições:** Usuário recém-cadastrado autenticado no sistema.
+- **Resultado obtido:** Painel de monitoramento exibido corretamente.
+- **Status:** ✅ Passou
+
+---
+
+#### CT-005 – Validar início, pausa e finalização do passeio
+
+- **Prioridade:** Alta
+- **Rastreabilidade:** RN05 – Início do passeio / RN06 – Finalização do passeio
+- **Pré-condições:** Usuário autenticado e condições climáticas liberadas para iniciar o passeio.
+
+| Passo | Ação | Resultados Esperados |
+| :---: | :--- | :--- |
+| 1 | Acessar o painel de monitoramento. | Painel do passeio apresentado com o usuário autenticado. |
+| 2 | Clicar em "Iniciar Passeio". | Passeio iniciado e cronômetro ativo exibido. |
+| 3 | Aguardar a contagem do cronômetro. | Cronômetro registra o tempo decorrido. |
+| 4 | Clicar em "Pausar". | Passeio pausado e botão "Continuar" exibido. |
+| 5 | Clicar em "Finalizar Passeio". | Passeio finalizado e status atualizado. |
+
+- **Pós-condições:** Passeio finalizado após início e pausa.
+- **Resultado obtido:** Cronômetro ativo, estado de pausa exibido e passeio finalizado.
+- **Status:** ✅ Passou
+
+---
+
+#### CT-006 – Validar continuação, finalização, histórico e gráfico do passeio
+
+- **Prioridade:** Alta
+- **Rastreabilidade:** RN06 – Finalização do passeio / RN07 – Histórico de passeios
+- **Pré-condições:** Usuário autenticado e passeio anteriormente iniciado e pausado.
+
+| Passo | Ação | Resultados Esperados |
+| :---: | :--- | :--- |
+| 1 | Verificar o painel do passeio. | Painel do passeio apresentado. |
+| 2 | Clicar em "Continuar". | Cronômetro ativo apresentado novamente. |
+| 3 | Aguardar o término da contagem configurada no teste. | Passeio finalizado e registrado. |
+| 4 | Verificar o resumo da caminhada. | Resumo exibido com o nome do cachorro. |
+| 5 | Verificar as calorias gastas. | Título "Total de calorias gastas pelo tutor" apresentado. |
+| 6 | Verificar o histórico detalhado. | Histórico apresentado com uma linha correspondente ao passeio. |
+| 7 | Verificar o gráfico de calorias. | Gráfico visível com uma barra correspondente ao passeio. |
+
+- **Pós-condições:** Passeio finalizado e registrado no histórico.
+- **Resultado obtido:** Resumo, total de calorias, histórico com uma linha e gráfico com uma barra apresentados.
+- **Status:** ✅ Passou
+
+---
+
+#### CT-007 – Validar o bloqueio do passeio por calor acima de 27 °C
+
+- **Prioridade:** Alta
+- **Rastreabilidade:** RN04 – Validação da temperatura / RN05 – Início do passeio
+- **Pré-condições:** Sistema disponível e usuário cadastrado no CEP `77001-002`, com calor acima de 27 °C, horário entre 9h e 16h (ex.: 10h00) e sem previsão de chuva.
+
+| Passo | Ação | Resultados Esperados |
+| :---: | :--- | :--- |
+| 1 | Cadastrar o usuário no CEP configurado para clima quente. | Cadastro realizado com sucesso. |
+| 2 | Acessar a tela de login e autenticar o usuário. | Usuário autenticado no sistema. |
+| 3 | Aguardar a resposta do diagnóstico climático. | Painel de monitoramento apresenta CEP, calor e impedimento de passeio. |
+| 4 | Verificar a mensagem de alerta exibida. | Alerta contendo "Calor acima de 27°C" apresentado. |
+| 5 | Verificar o botão de início do passeio. | Botão "Iniciar Passeio (Bloqueado)" exibido e desabilitado. |
+
+- **Pós-condições:** Usuário autenticado, porém o início do passeio permanece bloqueado por calor excessivo.
+- **Resultado obtido:** Alerta de calor apresentado e botão de início desabilitado.
+- **Status:** ✅ Passou
+
+---
+
+#### CT-008 – Validar a finalização do passeio em andamento com registro do horário de término e cálculo calórico
+
+- **Prioridade:** Alta
+- **Rastreabilidade:** RN06 – Finalização do passeio / RN07 – Histórico de passeios
+- **Pré-condições:** Sistema disponível, tutor cadastrado e passeio em andamento iniciado em condição climática favorável.
+
+| Passo | Ação | Resultados Esperados |
+| :---: | :--- | :--- |
+| 1 | Acessar a tela de login. | Tela de login é apresentada. |
+| 2 | Realizar autenticação com credenciais válidas. | Usuário autenticado com sucesso. |
+| 3 | Acessar a tela de passeio. | Tela de Passeio é apresentada. |
+| 4 | Acompanhar o cronômetro durante o percurso (ex.: 25 minutos). | Tempo de duração contabilizado corretamente durante o passeio em andamento. |
+| 5 | Acionar o botão "Finalizar Passeio". | Sistema encerra o passeio, registra o horário de término e atualiza o status para finalizado. |
+| 6 | Verificar o resumo da finalização e o cálculo calórico exibidos. | Gasto calórico calculado na taxa média de 4,2 kcal/min (ex.: 25 × 4,2 = 105 kcal). |
+| 7 | Acessar o histórico de passeios do tutor. | Passeio finalizado exibido no histórico com a duração (25 minutos) e as calorias calculadas (105 kcal). |
+
+- **Pós-condições:** Passeio encerrado com cálculo calórico registrado e adicionado ao histórico do tutor.
+- **Resultado obtido:** Passeio finalizado e calorias calculadas corretamente.
+- **Status:** ✅ Passou
+
+---
+
+#### CT-009 – Validar bloqueio preventivo de passeio por temperatura acima de 27 °C no período das 9h às 16h
+
+- **Prioridade:** Alta
+- **Rastreabilidade:** RN04 – Validação da temperatura (Regra R3)
+- **Pré-condições:** Sistema disponível, tutor autenticado, CEP válido, temperatura acima de 27 °C (ex.: 28 °C), horário entre 9h e 16h (ex.: 10h00) e ausência de previsão de chuva.
+
+| Passo | Ação | Resultados Esperados |
+| :---: | :--- | :--- |
+| 1 | Acessar a tela de login. | Tela de login é apresentada. |
+| 2 | Realizar autenticação com credenciais válidas. | Usuário autenticado com sucesso. |
+| 3 | Acessar a tela de passeio entre 9h e 16h (ex.: 10h00). | Temperatura acima de 27 °C (ex.: 28 °C) e ausência de previsão de chuva apresentadas. |
+| 4 | Verificar a mensagem exibida na seção "Passeio". | Alerta de bloqueio preventivo por temperatura apresentado. |
+| 5 | Verificar o botão de início do passeio. |
