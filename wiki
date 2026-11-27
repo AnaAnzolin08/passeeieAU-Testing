@@ -1,956 +1,146 @@
 # PasseieAu
 
-## Tabela de Decisão
+## Portfólio de Testes
 
-**Objetivo:** Validar se o sistema permite ou bloqueia o início do passeio conforme a temperatura e o horário.
+### Tabela de Decisão
 
-<table>
-  <thead>
-    <tr>
-      <th colspan="5" align="left">Condições e ações esperadas</th>
-    </tr>
-    <tr>
-      <th align="left">Condições / Regras</th>
-      <th align="center">R1</th>
-      <th align="center">R2</th>
-      <th align="center">R3</th>
-      <th align="center">R4</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Temperatura acima de 27 °C?</td>
-      <td align="center">Sim</td>
-      <td align="center">Sim</td>
-      <td align="center">Não</td>
-      <td align="center">Não</td>
-    </tr>
-    <tr>
-      <td>Horário entre 9h e 16h?</td>
-      <td align="center">Sim</td>
-      <td align="center">Não</td>
-      <td align="center">Sim</td>
-      <td align="center">Não</td>
-    </tr>
-    <tr>
-      <td colspan="5"><strong>Ações esperadas</strong></td>
-    </tr>
-    <tr>
-      <td>Bloquear início do passeio</td>
-      <td align="center">X</td>
-      <td align="center">–</td>
-      <td align="center">–</td>
-      <td align="center">–</td>
-    </tr>
-    <tr>
-      <td>Permitir início do passeio*</td>
-      <td align="center">–</td>
-      <td align="center">X</td>
-      <td align="center">X</td>
-      <td align="center">X</td>
-    </tr>
-  </tbody>
-</table>
+**Objetivo:** Validar se o sistema permite ou bloqueia o início do passeio conforme a temperatura e o horário. 【1-ea191f\|4】
 
-*\*Desde que não haja bloqueio por outra regra (RN03, previsão de chuva).*
+| Condições / Regras | R1 | R2 | R3 | R4 |
+|-------------------|----|----|----|----|
+| Temperatura acima de 27°C? | Sim | Sim | Não | Não |
+| Horário entre 9h e 16h? | Sim | Não | Sim | Não |
+| **Bloquear início do passeio** | X | - | - | - |
+| **Permitir início do passeio*** | - | X | X | X |
 
-### 4 combinações identificadas
-A tabela possui quatro combinações possíveis (2 condições com 2 valores cada = $2^2$ regras), e cada regra é coberta por um caso de teste. Aplicando a análise de valor-limite, o **CT-012** (27 °C, no limite) e o **CT-009** (28 °C, acima do limite) validam a fronteira de temperatura, pois o bloqueio ocorre somente quando a temperatura é superior a 27 °C. O **CT-011** (16h01) valida a fronteira de horário, logo após o fim do período de bloqueio.
+> *Desde que não haja bloqueio por outra regra (RN03 - previsão de chuva).*
+
+### Análise
+
+Foram identificadas **4 combinações possíveis** (2 condições com 2 valores cada = 2² regras).
+
+Os testes de valor-limite contemplam:
+
+- **CT-009**: Temperatura de 28°C (acima do limite).
+- **CT-012**: Temperatura de 27°C (valor-limite).
+- **CT-011**: Horário de 16h01 (fora da faixa de bloqueio).
 
 ---
 
-## Casos de Teste *(Baseado na ISO-29119-3)*
+# Casos de Teste
 
-### CT-001
-<table>
-  <tr>
-    <td><strong>ID</strong></td>
-    <td colspan="2">CT-001</td>
-  </tr>
-  <tr>
-    <td><strong>Título</strong></td>
-    <td colspan="2">Validar o login com e-mail e senha válidos.</td>
-  </tr>
-  <tr>
-    <td><strong>Prioridade</strong></td>
-    <td colspan="2">Alta</td>
-  </tr>
-  <tr>
-    <td><strong>Rastreabilidade</strong></td>
-    <td colspan="2">RN01 – Login e autenticação</td>
-  </tr>
-  <tr>
-    <td><strong>Pré-Condições</strong></td>
-    <td colspan="2">Sistema disponível e usuário na tela inicial.</td>
-  </tr>
-  <tr>
-    <td colspan="3"><strong>Passos</strong></td>
-  </tr>
-  <tr>
-    <th>Passo</th>
-    <th>Ação</th>
-    <th>Resultados Esperados</th>
-  </tr>
-  <tr>
-    <td>Passo 1</td>
-    <td>Clicar em "Cadastrar tutor e pet".</td>
-    <td>Tela de cadastro apresentada.</td>
-  </tr>
-  <tr>
-    <td>Passo 2</td>
-    <td>Preencher os dados do tutor e do cachorro e concluir o cadastro.</td>
-    <td>Cadastro realizado com sucesso.</td>
-  </tr>
-  <tr>
-    <td>Passo 3</td>
-    <td>Acessar a tela de login.</td>
-    <td>Tela "Entrar na conta do tutor" apresentada.</td>
-  </tr>
-  <tr>
-    <td>Passo 4</td>
-    <td>Informar o e-mail e a senha válidos do usuário.</td>
-    <td>Campos preenchidos corretamente.</td>
-  </tr>
-  <tr>
-    <td>Passo 5</td>
-    <td>Clicar no botão "Entrar e verificar clima".</td>
-    <td>Sistema autentica o usuário e apresenta o painel de monitoramento do passeio.</td>
-  </tr>
-  <tr>
-    <td><strong>Pós-Condições</strong></td>
-    <td colspan="2">
-      <strong>Pós-condição:</strong> Usuário autenticado no sistema.<br>
-      <strong>Resultado obtido:</strong> Tela de monitoramento exibida com o nome do tutor, nome do cachorro e login do usuário.<br>
-      <strong>Status:</strong> Passou
-    </td>
-  </tr>
-</table>
+## CT-001 - Login com credenciais válidas
 
-<br>
+| Campo | Valor |
+|---------|---------|
+| ID | CT-001 |
+| Prioridade | Alta |
+| Rastreabilidade | RN01 – Login e autenticação |
 
-### CT-002
-<table>
-  <tr>
-    <td><strong>ID</strong></td>
-    <td colspan="2">CT-002</td>
-  </tr>
-  <tr>
-    <td><strong>Título</strong></td>
-    <td colspan="2">Validar o login com senha inválida.</td>
-  </tr>
-  <tr>
-    <td><strong>Prioridade</strong></td>
-    <td colspan="2">Alta</td>
-  </tr>
-  <tr>
-    <td><strong>Rastreabilidade</strong></td>
-    <td colspan="2">RN01 – Login e autenticação</td>
-  </tr>
-  <tr>
-    <td><strong>Pré-Condições</strong></td>
-    <td colspan="2">Sistema disponível e usuário cadastrado no sistema.</td>
-  </tr>
-  <tr>
-    <td colspan="3"><strong>Passos</strong></td>
-  </tr>
-  <tr>
-    <th>Passo</th>
-    <th>Ação</th>
-    <th>Resultados Esperados</th>
-  </tr>
-  <tr>
-    <td>Passo 1</td>
-    <td>Acessar a tela de login.</td>
-    <td>Tela "Entrar na conta do tutor" apresentada.</td>
-  </tr>
-  <tr>
-    <td>Passo 2</td>
-    <td>Informar o e-mail válido do usuário.</td>
-    <td>E-mail preenchido no campo correspondente.</td>
-  </tr>
-  <tr>
-    <td>Passo 3</td>
-    <td>Informar uma senha inválida.</td>
-    <td>Senha inválida preenchida no campo correspondente.</td>
-  </tr>
-  <tr>
-    <td>Passo 4</td>
-    <td>Clicar em "Entrar e verificar clima".</td>
-    <td>Acesso negado e mensagem de erro apresentada.</td>
-  </tr>
-  <tr>
-    <td>Passo 5</td>
-    <td>Verificar a permanência na tela de login.</td>
-    <td>Sistema mantém o usuário não autenticado.</td>
-  </tr>
-  <tr>
-    <td><strong>Pós-Condições</strong></td>
-    <td colspan="2">
-      <strong>Pós-condição:</strong> Usuário permanece não autenticado na tela de login.<br>
-      <strong>Resultado obtido:</strong> Mensagem de erro contendo "senha" exibida e tela de login mantida.<br>
-      <strong>Status:</strong> Passou
-    </td>
-  </tr>
-</table>
+### Pré-condições
 
-<br>
+- Sistema disponível.
+- Usuário na tela inicial.
 
-### CT-003
-<table>
-  <tr>
-    <td><strong>ID</strong></td>
-    <td colspan="2">CT-003</td>
-  </tr>
-  <tr>
-    <td><strong>Título</strong></td>
-    <td colspan="2">Cadastrar um novo usuário com dados válidos.</td>
-  </tr>
-  <tr>
-    <td><strong>Prioridade</strong></td>
-    <td colspan="2">Alta</td>
-  </tr>
-  <tr>
-    <td><strong>Rastreabilidade</strong></td>
-    <td colspan="2">RN02 – Cadastro de usuário</td>
-  </tr>
-  <tr>
-    <td><strong>Pré-Condições</strong></td>
-    <td colspan="2">Sistema disponível e usuário na tela inicial.</td>
-  </tr>
-  <tr>
-    <td colspan="3"><strong>Passos</strong></td>
-  </tr>
-  <tr>
-    <th>Passo</th>
-    <th>Ação</th>
-    <th>Resultados Esperados</th>
-  </tr>
-  <tr>
-    <td>Passo 1</td>
-    <td>Acessar a tela inicial e clicar em "Cadastrar tutor e pet".</td>
-    <td>Tela de cadastro apresentada.</td>
-  </tr>
-  <tr>
-    <td>Passo 2</td>
-    <td>Informar nome do tutor, e-mail, senha, nome do cachorro e CEP válidos.</td>
-    <td>Campos obrigatórios preenchidos corretamente.</td>
-  </tr>
-  <tr>
-    <td>Passo 3</td>
-    <td>Clicar em "Concluir cadastro do tutor e pet".</td>
-    <td>Sistema valida os dados informados.</td>
-  </tr>
-  <tr>
-    <td>Passo 4</td>
-    <td>Aguardar o processamento do cadastro.</td>
-    <td>Cadastro realizado com sucesso.</td>
-  </tr>
-  <tr>
-    <td>Passo 5</td>
-    <td>Verificar a apresentação da tela de login.</td>
-    <td>Campo de login e botão "Entrar e verificar clima" apresentados.</td>
-  </tr>
-  <tr>
-    <td><strong>Pós-Condições</strong></td>
-    <td colspan="2">
-      <strong>Pós-condição:</strong> Tutor e cachorro cadastrados e usuário encaminhado para a tela de login.<br>
-      <strong>Resultado obtido:</strong> Cadastro concluído e tela de login exibida.<br>
-      <strong>Status:</strong> Passou
-    </td>
-  </tr>
-</table>
+### Passos
 
-<br>
+1. Clicar em **Cadastrar tutor e pet**.
+2. Preencher os dados do tutor e do cachorro.
+3. Acessar a tela de login.
+4. Informar e-mail e senha válidos.
+5. Clicar em **Entrar e verificar clima**.
 
-### CT-004
-<table>
-  <tr>
-    <td><strong>ID</strong></td>
-    <td colspan="2">CT-004</td>
-  </tr>
-  <tr>
-    <td><strong>Título</strong></td>
-    <td colspan="2">Validar o login do usuário recém-cadastrado.</td>
-  </tr>
-  <tr>
-    <td><strong>Prioridade</strong></td>
-    <td colspan="2">Alta</td>
-  </tr>
-  <tr>
-    <td><strong>Rastreabilidade</strong></td>
-    <td colspan="2">RN01 – Login e autenticação / RN02 – Cadastro de usuário</td>
-  </tr>
-  <tr>
-    <td><strong>Pré-Condições</strong></td>
-    <td colspan="2">Usuário cadastrado com dados válidos e sistema disponível.</td>
-  </tr>
-  <tr>
-    <td colspan="3"><strong>Passos</strong></td>
-  </tr>
-  <tr>
-    <th>Passo</th>
-    <th>Ação</th>
-    <th>Resultados Esperados</th>
-  </tr>
-  <tr>
-    <td>Passo 1</td>
-    <td>Acessar a tela de login.</td>
-    <td>Tela "Entrar na conta do tutor" apresentada.</td>
-  </tr>
-  <tr>
-    <td>Passo 2</td>
-    <td>Informar o e-mail e a senha usados no cadastro.</td>
-    <td>Campos preenchidos corretamente.</td>
-  </tr>
-  <tr>
-    <td>Passo 3</td>
-    <td>Clicar em "Entrar e verificar clima".</td>
-    <td>Sistema valida as credenciais e consulta as informações climáticas do CEP.</td>
-  </tr>
-  <tr>
-    <td>Passo 4</td>
-    <td>Aguardar o processamento do login.</td>
-    <td>Usuário autenticado com sucesso.</td>
-  </tr>
-  <tr>
-    <td>Passo 5</td>
-    <td>Verificar o painel de monitoramento.</td>
-    <td>Painel exibido com o nome do cachorro, tutor e login cadastrados.</td>
-  </tr>
-  <tr>
-    <td><strong>Pós-Condições</strong></td>
-    <td colspan="2">
-      <strong>Pós-condição:</strong> Usuário recém-cadastrado autenticado no sistema.<br>
-      <strong>Resultado obtido:</strong> Painel de monitoramento exibido corretamente.<br>
-      <strong>Status:</strong> Passou
-    </td>
-  </tr>
-</table>
+### Resultado Esperado
 
-<br>
+- Usuário autenticado.
+- Painel de monitoramento exibido.
 
-### CT-005
-<table>
-  <tr>
-    <td><strong>ID</strong></td>
-    <td colspan="2">CT-005</td>
-  </tr>
-  <tr>
-    <td><strong>Título</strong></td>
-    <td colspan="2">Validar início, pausa e finalização do passeio.</td>
-  </tr>
-  <tr>
-    <td><strong>Prioridade</strong></td>
-    <td colspan="2">Alta</td>
-  </tr>
-  <tr>
-    <td><strong>Rastreabilidade</strong></td>
-    <td colspan="2">RN05 – Início do passeio / RN06 – Finalização do passeio</td>
-  </tr>
-  <tr>
-    <td><strong>Pré-Condições</strong></td>
-    <td colspan="2">Usuário autenticado e condições climáticas liberadas para iniciar o passeio.</td>
-  </tr>
-  <tr>
-    <td colspan="3"><strong>Passos</strong></td>
-  </tr>
-  <tr>
-    <th>Passo</th>
-    <th>Ação</th>
-    <th>Resultados Esperados</th>
-  </tr>
-  <tr>
-    <td>Passo 1</td>
-    <td>Acessar o painel de monitoramento.</td>
-    <td>Painel do passeio apresentado com o usuário autenticado.</td>
-  </tr>
-  <tr>
-    <td>Passo 2</td>
-    <td>Clicar em "Iniciar Passeio".</td>
-    <td>Passeio iniciado e cronômetro ativo exibido.</td>
-  </tr>
-  <tr>
-    <td>Passo 3</td>
-    <td>Aguardar a contagem do cronômetro.</td>
-    <td>Cronômetro registra o tempo decorrido.</td>
-  </tr>
-  <tr>
-    <td>Passo 4</td>
-    <td>Clicar em "Pausar".</td>
-    <td>Passeio pausado e botão "Continuar" exibido.</td>
-  </tr>
-  <tr>
-    <td>Passo 5</td>
-    <td>Clicar em "Finalizar Passeio".</td>
-    <td>Passeio finalizado e status atualizado.</td>
-  </tr>
-  <tr>
-    <td><strong>Pós-Condições</strong></td>
-    <td colspan="2">
-      <strong>Pós-condição:</strong> Passeio finalizado após início e pausa.<br>
-      <strong>Resultado obtido:</strong> Cronômetro ativo, estado de pausa exibido e passeio finalizado.<br>
-      <strong>Status:</strong> Passou
-    </td>
-  </tr>
-</table>
+### Status
 
-<br>
+✅ Passou
 
-### CT-006
-<table>
-  <tr>
-    <td><strong>ID</strong></td>
-    <td colspan="2">CT-006</td>
-  </tr>
-  <tr>
-    <td><strong>Título</strong></td>
-    <td colspan="2">Validar continuação, finalização, histórico e gráfico do passeio.</td>
-  </tr>
-  <tr>
-    <td><strong>Prioridade</strong></td>
-    <td colspan="2">Alta</td>
-  </tr>
-  <tr>
-    <td><strong>Rastreabilidade</strong></td>
-    <td colspan="2">RN06 – Finalização do passeio / RN07 – Histórico de passeios</td>
-  </tr>
-  <tr>
-    <td><strong>Pré-Condições</strong></td>
-    <td colspan="2">Usuário autenticado e passeio anteriormente iniciado e pausado.</td>
-  </tr>
-  <tr>
-    <td colspan="3"><strong>Passos</strong></td>
-  </tr>
-  <tr>
-    <th>Passo</th>
-    <th>Ação</th>
-    <th>Resultados Esperados</th>
-  </tr>
-  <tr>
-    <td>Passo 1</td>
-    <td>Verificar o painel do passeio.</td>
-    <td>Painel do passeio apresentado.</td>
-  </tr>
-  <tr>
-    <td>Passo 2</td>
-    <td>Clicar em "Continuar".</td>
-    <td>Cronômetro ativo apresentado novamente.</td>
-  </tr>
-  <tr>
-    <td>Passo 3</td>
-    <td>Aguardar o término da contagem configurada no teste.</td>
-    <td>Passeio finalizado e registrado.</td>
-  </tr>
-  <tr>
-    <td>Passo 4</td>
-    <td>Verificar o resumo da caminhada.</td>
-    <td>Resumo exibido com o nome do cachorro.</td>
-  </tr>
-  <tr>
-    <td>Passo 5</td>
-    <td>Verificar as calorias gastas.</td>
-    <td>Título "Total de calorias gastas pelo tutor" apresentado.</td>
-  </tr>
-  <tr>
-    <td>Passo 6</td>
-    <td>Verificar o histórico detalhado.</td>
-    <td>Histórico apresentado com uma linha correspondente ao passeio.</td>
-  </tr>
-  <tr>
-    <td>Passo 7</td>
-    <td>Verificar o gráfico de calorias.</td>
-    <td>Gráfico visível com uma barra correspondente ao passeio.</td>
-  </tr>
-  <tr>
-    <td><strong>Pós-Condições</strong></td>
-    <td colspan="2">
-      <strong>Pós-condição:</strong> Passeio finalizado e registrado no histórico.<br>
-      <strong>Resultado obtido:</strong> Resumo, total de calorias, histórico com uma linha e gráfico com uma barra apresentados.<br>
-      <strong>Status:</strong> Passou
-    </td>
-  </tr>
-</table>
+---
 
-<br>
+## CT-002 - Login com senha inválida
 
-### CT-007
-<table>
-  <tr>
-    <td><strong>ID</strong></td>
-    <td colspan="2">CT-007</td>
-  </tr>
-  <tr>
-    <td><strong>Título</strong></td>
-    <td colspan="2">Validar o bloqueio do passeio por calor acima de 27 °C.</td>
-  </tr>
-  <tr>
-    <td><strong>Prioridade</strong></td>
-    <td colspan="2">Alta</td>
-  </tr>
-  <tr>
-    <td><strong>Rastreabilidade</strong></td>
-    <td colspan="2">RN04 – Validação da temperatura / RN05 – Início do passeio</td>
-  </tr>
-  <tr>
-    <td><strong>Pré-Condições</strong></td>
-    <td colspan="2">Sistema disponível e usuário cadastrado no CEP 77001-002, com calor acima de 27 °C, horário entre 9h e 16h (ex.: 10h00) e sem previsão de chuva.</td>
-  </tr>
-  <tr>
-    <td colspan="3"><strong>Passos</strong></td>
-  </tr>
-  <tr>
-    <th>Passo</th>
-    <th>Ação</th>
-    <th>Resultados Esperados</th>
-  </tr>
-  <tr>
-    <td>Passo 1</td>
-    <td>Cadastrar o usuário no CEP configurado para clima quente.</td>
-    <td>Cadastro realizado com sucesso.</td>
-  </tr>
-  <tr>
-    <td>Passo 2</td>
-    <td>Acessar a tela de login e autenticar o usuário.</td>
-    <td>Usuário autenticado no sistema.</td>
-  </tr>
-  <tr>
-    <td>Passo 3</td>
-    <td>Aguardar a resposta do diagnóstico climático.</td>
-    <td>Painel de monitoramento apresenta CEP, calor e impedimento de passeio.</td>
-  </tr>
-  <tr>
-    <td>Passo 4</td>
-    <td>Verificar a mensagem de alerta exibida.</td>
-    <td>Alerta contendo "Calor acima de 27°C" apresentado.</td>
-  </tr>
-  <tr>
-    <td>Passo 5</td>
-    <td>Verificar o botão de início do passeio.</td>
-    <td>Botão "Iniciar Passeio (Bloqueado)" exibido e desabilitado.</td>
-  </tr>
-  <tr>
-    <td><strong>Pós-Condições</strong></td>
-    <td colspan="2">
-      <strong>Pós-condição:</strong> Usuário autenticado, porém o início do passeio permanece bloqueado por calor excessivo.<br>
-      <strong>Resultado obtido:</strong> Alerta de calor apresentado e botão de início desabilitado.<br>
-      <strong>Status:</strong> Passou
-    </td>
-  </tr>
-</table>
+| Campo | Valor |
+|---------|---------|
+| ID | CT-002 |
+| Prioridade | Alta |
+| Rastreabilidade | RN01 – Login e autenticação |
 
-<br>
+### Resultado Esperado
 
-### CT-008
-<table>
-  <tr>
-    <td><strong>ID</strong></td>
-    <td colspan="2">CT-008</td>
-  </tr>
-  <tr>
-    <td><strong>Título</strong></td>
-    <td colspan="2">Validar a finalização do passeio em andamento com registro do horário de término e cálculo calórico</td>
-  </tr>
-  <tr>
-    <td><strong>Prioridade</strong></td>
-    <td colspan="2">Alta</td>
-  </tr>
-  <tr>
-    <td><strong>Rastreabilidade</strong></td>
-    <td colspan="2">RN06 – Finalização do passeio / RN07 – Histórico de passeios</td>
-  </tr>
-  <tr>
-    <td><strong>Pré-Condições</strong></td>
-    <td colspan="2">Sistema disponível, tutor cadastrado e passeio em andamento iniciado em condição climática favorável.</td>
-  </tr>
-  <tr>
-    <td colspan="3"><strong>Passos</strong></td>
-  </tr>
-  <tr>
-    <th>Passo</th>
-    <th>Ação</th>
-    <th>Resultados Esperados</th>
-  </tr>
-  <tr>
-    <td>Passo 1</td>
-    <td>Acessar a tela de login.</td>
-    <td>Tela de login é apresentada.</td>
-  </tr>
-  <tr>
-    <td>Passo 2</td>
-    <td>Realizar autenticação com credenciais válidas.</td>
-    <td>Usuário autenticado com sucesso.</td>
-  </tr>
-  <tr>
-    <td>Passo 3</td>
-    <td>Acessar a tela de passeio.</td>
-    <td>Tela de Passeio é apresentada.</td>
-  </tr>
-  <tr>
-    <td>Passo 4</td>
-    <td>Acompanhar o cronômetro durante o percurso (ex.: 25 minutos).</td>
-    <td>Tempo de duração contabilizado corretamente durante o passeio em andamento.</td>
-  </tr>
-  <tr>
-    <td>Passo 5</td>
-    <td>Acionar o botão "Finalizar Passeio".</td>
-    <td>Sistema encerra o passeio, registra o horário de término e atualiza o status para finalizado.</td>
-  </tr>
-  <tr>
-    <td>Passo 6</td>
-    <td>Verificar o resumo da finalização e o cálculo calórico exibidos.</td>
-    <td>Gasto calórico calculado na taxa média de 4,2 kcal/min (ex.: 25 × 4,2 = 105 kcal).</td>
-  </tr>
-  <tr>
-    <td>Passo 7</td>
-    <td>Acessar o histórico de passeios do tutor.</td>
-    <td>Passeio finalizado exibido no histórico com a duração (25 minutos) e as calorias calculadas (105 kcal).</td>
-  </tr>
-  <tr>
-    <td><strong>Pós-Condições</strong></td>
-    <td colspan="2">
-      <strong>Pós-condição:</strong> Passeio encerrado com cálculo calórico registrado e adicionado ao histórico do tutor.<br>
-      <strong>Resultado obtido:</strong> Passeio finalizado e calorias calculadas corretamente.<br>
-      <strong>Status:</strong> Passou
-    </td>
-  </tr>
-</table>
+- Acesso negado.
+- Mensagem de erro apresentada.
+- Usuário permanece na tela de login.
 
-<br>
+### Status
 
-### CT-009
-<table>
-  <tr>
-    <td><strong>ID</strong></td>
-    <td colspan="2">CT-009</td>
-  </tr>
-  <tr>
-    <td><strong>Título</strong></td>
-    <td colspan="2">Validar bloqueio preventivo de passeio por temperatura acima de 27 °C no período das 9h às 16h</td>
-  </tr>
-  <tr>
-    <td><strong>Prioridade</strong></td>
-    <td colspan="2">Alta</td>
-  </tr>
-  <tr>
-    <td><strong>Rastreabilidade</strong></td>
-    <td colspan="2">RN04 – Validação da temperatura</td>
-  </tr>
-  <tr>
-    <td><strong>Pré-Condições</strong></td>
-    <td colspan="2">Sistema disponível, tutor autenticado, CEP válido, temperatura acima de 27 °C (ex.: 28 °C), horário entre 9h e 16h (ex.: 10h00) e ausência de previsão de chuva.</td>
-  </tr>
-  <tr>
-    <td colspan="3"><strong>Passos</strong></td>
-  </tr>
-  <tr>
-    <th>Passo</th>
-    <th>Ação</th>
-    <th>Resultados Esperados</th>
-  </tr>
-  <tr>
-    <td>Passo 1</td>
-    <td>Acessar a tela de login.</td>
-    <td>Tela de login é apresentada.</td>
-  </tr>
-  <tr>
-    <td>Passo 2</td>
-    <td>Realizar autenticação com credenciais válidas.</td>
-    <td>Usuário autenticado com sucesso.</td>
-  </tr>
-  <tr>
-    <td>Passo 3</td>
-    <td>Acessar a tela de passeio entre 9h e 16h (ex.: 10h00).</td>
-    <td>Temperatura acima de 27 °C (ex.: 28 °C) e ausência de previsão de chuva apresentadas.</td>
-  </tr>
-  <tr>
-    <td>Passo 4</td>
-    <td>Verificar a mensagem exibida na seção "Passeio".</td>
-    <td>Alerta de bloqueio preventivo por temperatura apresentado.</td>
-  </tr>
-  <tr>
-    <td>Passo 5</td>
-    <td>Verificar o botão de início do passeio.</td>
-    <td>Botão "Iniciar Passeio" bloqueado, impedindo o início do passeio.</td>
-  </tr>
-  <tr>
-    <td><strong>Pós-Condições</strong></td>
-    <td colspan="2">
-      <strong>Pós-condição:</strong> O passeio não é iniciado enquanto a temperatura estiver acima de 27 °C no período das 9h às 16h.<br>
-      <strong>Resultado obtido:</strong> A preencher após a execução.<br>
-      <strong>Status:</strong> A executar
-    </td>
-  </tr>
-</table>
+✅ Passou
 
-<br>
+---
 
-### CT-010
-<table>
-  <tr>
-    <td><strong>ID</strong></td>
-    <td colspan="2">CT-010</td>
-  </tr>
-  <tr>
-    <td><strong>Título</strong></td>
-    <td colspan="2">Validar exibição do histórico de passeios realizados</td>
-  </tr>
-  <tr>
-    <td><strong>Prioridade</strong></td>
-    <td colspan="2">Média</td>
-  </tr>
-  <tr>
-    <td><strong>Rastreabilidade</strong></td>
-    <td colspan="2">RN07 – Histórico de passeios</td>
-  </tr>
-  <tr>
-    <td><strong>Pré-Condições</strong></td>
-    <td colspan="2">Sistema disponível, tutor cadastrado e com passeios finalizados registrados no histórico (ex.: 3 registros).</td>
-  </tr>
-  <tr>
-    <td colspan="3"><strong>Passos</strong></td>
-  </tr>
-  <tr>
-    <th>Passo</th>
-    <th>Ação</th>
-    <th>Resultados Esperados</th>
-  </tr>
-  <tr>
-    <td>Passo 1</td>
-    <td>Acessar a tela de login.</td>
-    <td>Tela de login é apresentada.</td>
-  </tr>
-  <tr>
-    <td>Passo 2</td>
-    <td>Realizar autenticação com credenciais válidas.</td>
-    <td>Usuário autenticado com sucesso.</td>
-  </tr>
-  <tr>
-    <td>Passo 3</td>
-    <td>Acessar a aba "Finalização".</td>
-    <td>Tela de finalização é apresentada e histórico com os indicadores e o gráfico.</td>
-  </tr>
-  <tr>
-    <td>Passo 4</td>
-    <td>Verificar o indicador de quantidade total de registros (ex.: 3 registros).</td>
-    <td>Seção apresentada com o total de registros coerente com a lista exibida.</td>
-  </tr>
-  <tr>
-    <td>Passo 5</td>
-    <td>Verificar a exibição de data e horário de início de cada passeio.</td>
-    <td>Data e horário de início apresentados corretamente para cada registro.</td>
-  </tr>
-  <tr>
-    <td>Passo 6</td>
-    <td>Verificar a exibição do horário de término e do status de cada passeio.</td>
-    <td>Horário de término e status (ex.: Finalizado / Concluído) apresentados para cada registro.</td>
-  </tr>
-  <tr>
-    <td><strong>Pós-Condições</strong></td>
-    <td colspan="2">
-      <strong>Pós-condição:</strong> Histórico apresenta data, horário de início, horário de término e status coerentes com os indicadores.<br>
-      <strong>Resultado obtido:</strong> A tela apresenta data/início, tutor, pet, CEP e clima, duração e calorias, mas não exibe horário de término nem status (divergência identificada em relação à RN07).<br>
-      <strong>Status:</strong> Falhou
-    </td>
-  </tr>
-</table>
+## CT-003 - Cadastro de novo usuário
 
-<br>
+| Campo | Valor |
+|---------|---------|
+| ID | CT-003 |
+| Prioridade | Alta |
+| Rastreabilidade | RN02 – Cadastro de usuário |
 
-### CT-011
-<table>
-  <tr>
-    <td><strong>ID</strong></td>
-    <td colspan="2">CT-011</td>
-  </tr>
-  <tr>
-    <td><strong>Título</strong></td>
-    <td colspan="2">Validar que temperatura acima de 27 °C fora do período das 9h às 16h não bloqueia o passeio</td>
-  </tr>
-  <tr>
-    <td><strong>Prioridade</strong></td>
-    <td colspan="2">Alta</td>
-  </tr>
-  <tr>
-    <td><strong>Rastreabilidade</strong></td>
-    <td colspan="2">RN04 – Validação da temperatura</td>
-  </tr>
-  <tr>
-    <td><strong>Pré-Condições</strong></td>
-    <td colspan="2">Sistema disponível, tutor autenticado, CEP válido, temperatura acima de 27 °C (ex.: 28 °C), horário fora do intervalo das 9h às 16h (ex.: 16h01) e ausência de previsão de chuva.</td>
-  </tr>
-  <tr>
-    <td colspan="3"><strong>Passos</strong></td>
-  </tr>
-  <tr>
-    <th>Passo</th>
-    <th>Ação</th>
-    <th>Resultados Esperados</th>
-  </tr>
-  <tr>
-    <td>Passo 1</td>
-    <td>Acessar a tela de login.</td>
-    <td>Tela de login é apresentada.</td>
-  </tr>
-  <tr>
-    <td>Passo 2</td>
-    <td>Realizar autenticação com credenciais válidas.</td>
-    <td>Usuário autenticado com sucesso.</td>
-  </tr>
-  <tr>
-    <td>Passo 3</td>
-    <td>Acessar a tela de passeio fora do período das 9h às 16h (ex.: 16h01).</td>
-    <td>Temperatura acima de 27 °C (ex.: 28 °C) e ausência de previsão de chuva apresentadas.</td>
-  </tr>
-  <tr>
-    <td>Passo 4</td>
-    <td>Verificar a mensagem exibida na seção “Passeio”.</td>
-    <td>Nenhuma mensagem de bloqueio por temperatura apresentada.</td>
-  </tr>
-  <tr>
-    <td>Passo 5</td>
-    <td>Verificar o botão de início do passeio.</td>
-    <td>Botão “Iniciar Passeio” habilitado, permitindo o início do passeio.</td>
-  </tr>
-  <tr>
-    <td><strong>Pós-Condições</strong></td>
-    <td colspan="2">
-      <strong>Pós-condição:</strong> O passeio não é bloqueado por temperatura e pode ser iniciado.<br>
-      <strong>Resultado obtido:</strong> A preencher após a execução.<br>
-      <strong>Status:</strong> A executar
-    </td>
-  </tr>
-</table>
+### Resultado Esperado
 
-<br>
+- Cadastro realizado com sucesso.
+- Redirecionamento para tela de login.
 
-### CT-012
-<table>
-  <tr>
-    <td><strong>ID</strong></td>
-    <td colspan="2">CT-012</td>
-  </tr>
-  <tr>
-    <td><strong>Título</strong></td>
-    <td colspan="2">Validar que temperatura igual a 27 °C no período das 9h às 16h não bloqueia o passeio (valor-limite)</td>
-  </tr>
-  <tr>
-    <td><strong>Prioridade</strong></td>
-    <td colspan="2">Alta</td>
-  </tr>
-  <tr>
-    <td><strong>Rastreabilidade</strong></td>
-    <td colspan="2">RN04 – Validação da temperatura</td>
-  </tr>
-  <tr>
-    <td><strong>Pré-Condições</strong></td>
-    <td colspan="2">Sistema disponível, tutor autenticado, CEP válido, temperatura igual a 27 °C, horário entre 9h e 16h (ex.: 10h00) e ausência de previsão de chuva.</td>
-  </tr>
-  <tr>
-    <td colspan="3"><strong>Passos</strong></td>
-  </tr>
-  <tr>
-    <th>Passo</th>
-    <th>Ação</th>
-    <th>Resultados Esperados</th>
-  </tr>
-  <tr>
-    <td>Passo 1</td>
-    <td>Acessar a tela de login.</td>
-    <td>Tela de login é apresentada.</td>
-  </tr>
-  <tr>
-    <td>Passo 2</td>
-    <td>Realizar autenticação com credenciais válidas.</td>
-    <td>Usuário autenticado com sucesso.</td>
-  </tr>
-  <tr>
-    <td>Passo 3</td>
-    <td>Acessar a tela de passeio entre 9h e 16h (ex.: 10h00).</td>
-    <td>Temperatura igual a 27 °C e ausência de previsão de chuva apresentadas.</td>
-  </tr>
-  <tr>
-    <td>Passo 4</td>
-    <td>Verificar a mensagem exibida na seção "Passeio".</td>
-    <td>Nenhuma mensagem de bloqueio por temperatura apresentada.</td>
-  </tr>
-  <tr>
-    <td>Passo 5</td>
-    <td>Verificar o botão de início do passeio.</td>
-    <td>Botão "Iniciar Passeio" habilitado, permitindo o início do passeio.</td>
-  </tr>
-  <tr>
-    <td><strong>Pós-Condições</strong></td>
-    <td colspan="2">
-      <strong>Pós-condição:</strong> O passeio não é bloqueado por temperatura e pode ser iniciado.<br>
-      <strong>Resultado obtido:</strong> A preencher após a execução.<br>
-      <strong>Status:</strong> A executar
-    </td>
-  </tr>
-</table>
+### Status
 
-<br>
+✅ Passou
 
-### CT-013
-<table>
-  <tr>
-    <td><strong>ID</strong></td>
-    <td colspan="2">CT-013</td>
-  </tr>
-  <tr>
-    <td><strong>Título</strong></td>
-    <td colspan="2">Validar que temperatura até 27 °C fora do período das 9h às 16h não bloqueia o passeio</td>
-  </tr>
-  <tr>
-    <td><strong>Prioridade</strong></td>
-    <td colspan="2">Alta</td>
-  </tr>
-  <tr>
-    <td><strong>Rastreabilidade</strong></td>
-    <td colspan="2">RN04 – Validação da temperatura</td>
-  </tr>
-  <tr>
-    <td><strong>Pré-Condições</strong></td>
-    <td colspan="2">Sistema disponível, tutor autenticado, CEP válido, temperatura igual ou inferior a 27 °C (ex.: 20 °C), horário fora do intervalo das 9h às 16h (ex.: 20h00) e ausência de previsão de chuva.</td>
-  </tr>
-  <tr>
-    <td colspan="3"><strong>Passos</strong></td>
-  </tr>
-  <tr>
-    <th>Passo</th>
-    <th>Ação</th>
-    <th>Resultados Esperados</th>
-  </tr>
-  <tr>
-    <td>Passo 1</td>
-    <td>Acessar a tela de login.</td>
-    <td>Tela de login é apresentada.</td>
-  </tr>
-  <tr>
-    <td>Passo 2</td>
-    <td>Realizar autenticação com credenciais válidas.</td>
-    <td>Usuário autenticado com sucesso.</td>
-  </tr>
-  <tr>
-    <td>Passo 3</td>
-    <td>Acessar a tela de passeio fora do período das 9h às 16h (ex.: 20h00).</td>
-    <td>Temperatura igual ou inferior a 27 °C e ausência de previsão de chuva apresentadas.</td>
-  </tr>
-  <tr>
-    <td>Passo 4</td>
-    <td>Verificar a mensagem exibida na seção "Passeio".</td>
-    <td>Nenhuma mensagem de bloqueio por temperatura apresentada.</td>
-  </tr>
-  <tr>
-    <td>Passo 5</td>
-    <td>Verificar o botão de início do passeio.</td>
-    <td>Botão "Iniciar Passeio" habilitado, permitindo o início do passeio.</td>
-  </tr>
-  <tr>
-    <td><strong>Pós-Condições</strong></td>
-    <td colspan="2">
-      <strong>Pós-condição:</strong> O passeio não é bloqueado por temperatura e pode ser iniciado.<br>
-      <strong>Resultado obtido:</strong> A preencher após a execução.<br>
-      <strong>Status:</strong> A executar
-    </td>
-  </tr>
-</table>
+---
+
+## CT-004 - Login após cadastro
+
+| Campo | Valor |
+|---------|---------|
+| ID | CT-004 |
+| Prioridade | Alta |
+| Rastreabilidade | RN01 / RN02 |
+
+### Resultado Esperado
+
+- Usuário autenticado.
+- Painel de monitoramento apresentado.
+
+### Status
+
+✅ Passou
+
+---
+
+## CT-005 - Início, pausa e encerramento de passeio
+
+| Campo | Valor |
+|---------|---------|
+| ID | CT-005 |
+| Prioridade | Alta |
+| Rastreabilidade | RN05 / RN06 |
+
+### Resultado Esperado
+
+- Passeio iniciado.
+- Cronômetro ativo.
+- Pausa executada.
+- Passeio finalizado.
+
+### Status
+
+✅ Passou
+
+---
+
+## CT-006 - Histórico e gráfico do passeio
+
+| Campo | Valor |
+|---
