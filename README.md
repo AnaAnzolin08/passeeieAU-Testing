@@ -155,3 +155,4 @@ documentacao.Md
 ## Documentacao adicional
 - Regras de negocio e casos de teste: [documentacao.Md](documentacao.Md)
 - Relatorio de desempenho: [html-report.html](html-report.html)
+
