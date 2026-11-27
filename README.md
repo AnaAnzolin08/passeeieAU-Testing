@@ -1,6 +1,6 @@
 # PasseieAu
 
-> Rascunho da documentacao do projeto
+ Documentacao do projeto
 
 PasseieAu e uma aplicacao full-stack para planejar e acompanhar passeios com cachorros com seguranca. O sistema considera autenticacao, cadastro do tutor e do animal, clima local e historico dos passeios.
 
@@ -90,16 +90,7 @@ npm run cypress:run
 
 Para abrir o Cypress em modo visual:
 
-<<<<<<< HEAD
-| Tutor | E-mail (Login) | Senha | Cachorro | CEP | Cenário Climático Típico |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| Ana  | `ana@passeieau.com` | `corgi123` | Biscoito | `01310-100` (São Paulo, SP) | Clima ameno — passeio liberado |
-| Bruno Mendes | `bruno@passeieau.com` | `passeio123` | Pipoca | `40140-110` (Salvador, BA) | Calor intenso — exibe alerta de calor excessivo |
-| Carla Souza | `carla@passeieau.com` | `chuva123` | Pudim | `80010-000` (Curitiba, PR) | Previsão de chuva (fallback) — bloqueia início do passeio |
 
----
-=======
-```powershell
 npm run cypress:open
 ```
 
@@ -155,3 +146,4 @@ documentacao.Md
 ## Documentacao adicional
 - Regras de negocio e casos de teste: [documentacao.Md](documentacao.Md)
 - Relatorio de desempenho: [html-report.html](html-report.html)
+
