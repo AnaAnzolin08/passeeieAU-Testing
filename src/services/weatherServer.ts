@@ -1,26 +1,45 @@
 import type { WeatherReport } from '../types.ts';
+import { evaluateWalkSafety } from './walkSafety.ts';
 
 const HEAT_CAUTION_MESSAGE =
-  'Exige atenção redobrada, rotas na sombra, ritmo leve e água fresca. Evite passear entre 9h e 16h para prevenir hipertermia, desidratação e queimaduras nas patas pelo asfalto quente.';
+  'A temperatura está acima de 27°C, mas fora do horário de bloqueio. Prefira locais sombreados e leve água fresca.';
 
 const HEAT_BLOCK_MESSAGE =
-  'Alerta de Calor Excessivo (29°C ou acima): Altas temperaturas causam risco imediato de hipertermia severa, desidratação aguda e queimaduras graves nas almofadas das patas pelo asfalto superaquecido. O início do passeio foi bloqueado preventivamente.';
+  'Temperatura acima de 27°C entre 9h e 16h. O início do passeio foi bloqueado preventivamente.';
 
 const RAIN_BLOCK_MESSAGE =
   'Alerta de Tempo Chuvoso: A chuva aumenta o risco de hipotermia, quedas em pisos escorregadios, sustos com trovoadas e dermatites por umidade nas patas e pelagem. Mantenha seu cachorro em local seco e protegido e aguarde o tempo firmar. O início do passeio foi bloqueado preventivamente.';
 
-function evaluateHeatRule(temperatureC: number): {
+function currentSaoPauloTimestamp(): string {
+  const parts = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(new Date());
+  const part = (type: string) => parts.find((item) => item.type === type)?.value ?? '';
+  return `${part('year')}-${part('month')}-${part('day')}T${part('hour')}:${part('minute')}`;
+}
+
+function evaluateHeatRule(temperatureC: number, observedAt = currentSaoPauloTimestamp()): {
   isCaution: boolean;
   isExtremeBlock: boolean;
   excessiveHeat: boolean;
   heatWarning: string | null;
 } {
-  const isExtremeBlock = temperatureC >= 29;
-  const isCaution = temperatureC >= 26 && temperatureC < 29;
+  const { excessiveHeat, blockedByHeat: isExtremeBlock } = evaluateWalkSafety(
+    temperatureC,
+    false,
+    observedAt,
+  );
+  const isCaution = excessiveHeat && !isExtremeBlock;
   return {
     isCaution,
     isExtremeBlock,
-    excessiveHeat: isExtremeBlock || isCaution,
+    excessiveHeat,
     heatWarning: isExtremeBlock ? HEAT_BLOCK_MESSAGE : isCaution ? HEAT_CAUTION_MESSAGE : null,
   };
 }
@@ -106,7 +125,7 @@ function buildFallbackWeather(digits: string, cityLabel?: string): WeatherReport
     cityLabel: cityLabel || base.label,
     condition:
       heat.isExtremeBlock && !base.rain
-        ? `${base.condition} · Calor excessivo (≥ 29°C)`
+        ? `${base.condition} · Calor excessivo (> 27°C, 9h–16h)`
         : heat.isCaution && !base.rain
           ? `${base.condition} · Atenção redobrada`
           : base.condition,
@@ -141,6 +160,7 @@ export async function lookupWeatherByCep(rawCep: string): Promise<WeatherReport>
   if (!/^\d{8}$/.test(digits) || digits === '00000000') {
     throw new InvalidCepError('CEP não encontrado ou inválido. Informe 8 dígitos.');
   }
+
 
   const cached = weatherCache.get(digits);
   if (cached && cached.expiresAt > Date.now()) {
@@ -209,6 +229,7 @@ export async function lookupWeatherByCep(rawCep: string): Promise<WeatherReport>
 
     const weatherData = (await weatherRes.json()) as {
       current?: {
+        time?: string;
         temperature_2m?: number;
         apparent_temperature?: number;
         precipitation?: number;
@@ -226,14 +247,14 @@ export async function lookupWeatherByCep(rawCep: string): Promise<WeatherReport>
     const { condition, isRainCode } = describeWmoCode(Number(current.weather_code ?? 0));
     const hasRain =
       isRainCode || Number(current.rain ?? 0) > 0 || Number(current.precipitation ?? 0) > 0;
-    const heat = evaluateHeatRule(temperatureC);
+    const heat = evaluateHeatRule(temperatureC, current.time ?? currentSaoPauloTimestamp());
 
     const report: WeatherReport = {
       cep: formatCep(digits),
       cityLabel,
       condition:
         heat.isExtremeBlock && !hasRain
-          ? `${condition} · Calor excessivo (≥ 29°C)`
+          ? `${condition} · Calor excessivo (> 27°C, 9h–16h)`
           : heat.isCaution && !hasRain
             ? `${condition} · Atenção redobrada`
             : condition,

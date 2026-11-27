@@ -15,6 +15,31 @@ const EXTRA_PET_PHOTOS = [
     dogName: 'Thor',
     dogPhoto: '/src/assets/images/dog_avatar_beagle_1795046753785.jpg',
   },
+  {
+    id: 'extra-corgi-biscoito',
+    dogName: 'Biscoito',
+    dogPhoto: '/src/assets/images/corgi_avatar_biscoito_1795046208844.jpg',
+  },
+  {
+    id: 'extra-golden',
+    dogName: 'Mel',
+    dogPhoto: '/src/assets/images/dog_avatar_golden_1795046753182.jpg',
+  },
+  {
+    id: 'extra-frenchie',
+    dogName: 'Lola',
+    dogPhoto: '/src/assets/images/dog_avatar_frenchie_1795046753250.jpg',
+  },
+  {
+    id: 'extra-corgi-pudim',
+    dogName: 'Pudim',
+    dogPhoto: '/src/assets/images/corgi_avatar_pudim_1795046209907.jpg',
+  },
+  {
+    id: 'extra-corgi-pipoca',
+    dogName: 'Pipoca',
+    dogPhoto: '/src/assets/images/corgi_avatar_pipoca_1795046209722.jpg',
+  },
 ];
 
 export const CoverPage: React.FC<CoverPageProps> = ({ pets, onNavigate }) => {
@@ -25,7 +50,7 @@ export const CoverPage: React.FC<CoverPageProps> = ({ pets, onNavigate }) => {
       dogPhoto: p.dogPhoto,
     })),
     ...EXTRA_PET_PHOTOS,
-  ].slice(0, 4);
+  ].slice(0, 8);
 
   return (
     <main>

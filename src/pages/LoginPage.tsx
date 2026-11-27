@@ -25,19 +25,27 @@ interface LoginPageProps {
 const LOGIN_DOG_GALLERY = [
   {
     src: '/src/assets/images/corgi_avatar_biscoito_1795046208844.jpg',
-    alt: 'Corgi sorridente pronto para passear',
+    alt: 'Corgi Biscoito',
   },
   {
     src: '/src/assets/images/dog_avatar_golden_1795046753182.jpg',
-    alt: 'Golden Retriever feliz em área verde',
+    alt: 'Golden Retriever',
   },
   {
     src: '/src/assets/images/dog_avatar_frenchie_1795046753250.jpg',
-    alt: 'Buldogue Francês descansando antes do passeio',
+    alt: 'Buldogue Francês',
   },
   {
     src: '/src/assets/images/dog_avatar_beagle_1795046753785.jpg',
-    alt: 'Beagle atento para caminhada ao ar livre',
+    alt: 'Beagle',
+  },
+  {
+    src: '/src/assets/images/corgi_avatar_pudim_1795046209907.jpg',
+    alt: 'Corgi Pudim',
+  },
+  {
+    src: '/src/assets/images/corgi_avatar_pipoca_1795046209722.jpg',
+    alt: 'Corgi Pipoca',
   },
 ];
 
@@ -229,8 +237,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     />
                     <span>
                       {!currentWeather.canWalk && !currentWeather.hasRain
-                        ? `Calor excessivo (${currentWeather.temperatureC}°C) — Passeio bloqueado`
-                        : `Atenção redobrada (${currentWeather.temperatureC}°C · 26°C a 28°C)`}
+                        ? `Calor excessivo (${currentWeather.temperatureC}°C · acima de 27°C, das 9h às 16h)`
+                        : `Atenção redobrada (${currentWeather.temperatureC}°C fora do horário de bloqueio)`}
                     </span>
                   </div>
                   <p
@@ -278,7 +286,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     <span>
                       {currentWeather.hasRain
                         ? 'Início do passeio bloqueado (Chuva)'
-                        : 'Início do passeio bloqueado (≥ 29°C)'}
+                        : 'Início bloqueado: temperatura acima de 27°C entre 9h e 16h'}
                     </span>
                   </button>
                 )}
@@ -297,17 +305,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                 <div className="relative h-48 sm:h-52 bg-slate-100">
                   <PetPhoto
                     src="/src/assets/images/hero_corgi_walk_1795046209171.jpg"
-                    alt="Cachorro passeando com segurança em parque arborizado"
+                    alt="Cachorro passeando com segurança em um parque"
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent">
                     <p className="text-xs sm:text-sm font-medium text-white">
-                      Passeios pensados para o conforto térmico e a saúde do seu cachorro.
+                      Passeios seguros para cães de todos os tamanhos.
                     </p>
                   </div>
                 </div>
                 <div className="p-4 bg-slate-50/70 border-t border-slate-100">
-                  <div className="grid grid-cols-4 gap-3">
+                  <div className="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-3 gap-3">
                     {LOGIN_DOG_GALLERY.map((dog) => (
                       <div
                         key={dog.src}
@@ -325,12 +333,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               </div>
 
               <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-4">
-                <div className="flex items-center gap-2.5 text-amber-700">
-                  <ThermometerSun className="w-5 h-5 shrink-0" aria-hidden="true" />
-                  <h2 className="font-display text-lg font-bold text-slate-900">
-                    Alertas climáticos e cuidados térmicos
-                  </h2>
-                </div>
                 <p className="text-sm text-slate-600 leading-relaxed">
                   Ao autenticar-se, o sistema consulta automaticamente a condição climática do CEP
                   cadastrado e aplica duas proteções essenciais para a saúde do seu cachorro:
@@ -338,32 +340,20 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                 <div className="space-y-3 pt-2">
                   <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-200">
                     <p className="text-sm font-semibold text-slate-900">
-                      26 °C a 28 °C · Atenção redobrada
+                      Alerta sobre Calor Excessivo
                     </p>
                     <p className="mt-1 text-xs text-slate-700 leading-relaxed">
-                      Exige atenção redobrada, rotas na sombra, ritmo leve e água fresca. Evite
-                      passear entre 9h e 16h para prevenir hipertermia, desidratação e queimaduras
-                      nas patas pelo asfalto quente.
-                    </p>
-                  </div>
-                  <div className="p-4 rounded-xl bg-red-50/70 border border-red-200">
-                    <p className="text-sm font-semibold text-slate-900">
-                      29 °C ou acima · Calor excessivo (Bloqueio)
-                    </p>
-                    <p className="mt-1 text-xs text-slate-700 leading-relaxed">
-                      Temperaturas iguais ou superiores a 29 °C elevam criticamente o risco de
-                      hipertermia e queimaduras nos coxins, bloqueando preventivamente o início do
-                      passeio.
+                      Altas temperaturas elevam o risco de hipertermia, desidratação e queimaduras
+                      nos coxins das patas pelo contato com o asfalto aquecido.
                     </p>
                   </div>
                   <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
                     <p className="text-sm font-semibold text-slate-900">
-                      Tempo Chuvoso · Bloqueio Preventivo
+                      Bloqueio Preventivo por Previsão de Chuva
                     </p>
                     <p className="mt-1 text-xs text-slate-700 leading-relaxed">
-                      Quando há previsão de chuva no CEP do tutor, são exibidos cuidados contra
-                      hipotermia, pisos escorregadios e umidade, e o início do passeio é bloqueado
-                      preventivamente.
+                      Quando há previsão de chuva no CEP do tutor, um aviso de segurança é exibido e
+                      o início do passeio é impedido na plataforma.
                     </p>
                   </div>
                 </div>

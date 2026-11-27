@@ -1,0 +1,14 @@
+{
+  "payload": {},
+  "respostasEsperadas": {
+    "sucesso201": {
+      "status": "in_progress"
+    },
+    "bloqueioChuva403": {
+      "error": "Alerta de Tempo Chuvoso: A chuva aumenta o risco de hipotermia, quedas em pisos escorregadios, sustos com trovoadas e dermatites por umidade nas patas e pelagem. Mantenha seu cachorro em local seco e protegido e aguarde o tempo firmar. O início do passeio foi bloqueado preventivamente."
+    },
+    "erroCep400": {
+      "error": "CEP não encontrado ou inválido. Informe 8 dígitos."
+    }
+  }
+}

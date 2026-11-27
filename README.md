@@ -1,66 +1,96 @@
-# PasseieAu — Passeio Seguro com seu Cachorro
+# PasseieAu
 
-## 1. O que é esta aplicação
+> Rascunho da documentacao do projeto
 
-O **PasseieAu** é uma aplicação full-stack (API REST + Site Web) desenvolvida para organizar e monitorar passeios seguros com seu cachorro.
+PasseieAu e uma aplicacao full-stack para planejar e acompanhar passeios com cachorros com seguranca. O sistema considera autenticacao, cadastro do tutor e do animal, clima local e historico dos passeios.
 
-A plataforma concentra exatamente **4 funcionalidades principais**:
-1. **Login**: Autenticação do tutor com consulta automática das condições climáticas do seu CEP, exibindo alertas de calor excessivo ou bloqueio em dias de chuva.
-2. **Cadastro**: Criação de conta do tutor e perfil do cachorro (e-mail, senha, nome do tutor, nome do cachorro, CEP e foto do pet).
-3. **Passeio**: Cronômetro em tempo real com ações de iniciar, pausar, continuar e estimativa instantânea de calorias gastas pelo tutor (`4,2 kcal/min`).
-4. **Finalização**: Encerramento do passeio, persistência no banco em memória, gráfico comparativo de gasto calórico e histórico completo do tutor.
+## Tecnologias
 
-A arquitetura utiliza:
-- **Backend**: Node.js + Express + TypeScript (`server.ts`)
-- **Banco de Dados em Memória**: Coleções em memória no estilo `mongodb-memory-server` (`src/db/memoryDb.ts`), inicializadas automaticamente a cada execução sem exigir servidor MongoDB externo.
-- **Documentação Swagger**: Especificação OpenAPI 3.0.3 em YAML (`swagger.yaml`) renderizada interativamente via Swagger UI nos endpoints `/docs` e `/api/docs`.
-- **Frontend**: React + Vite + Tailwind CSS.
+- Node.js
+- Express
+- TypeScript
+- React
+- Vite
+- Tailwind CSS
+- Cypress
+- Mocha e Supertest
+- k6
 
----
+## Funcionalidades
 
-## 2. Como instalar
+- Cadastro e login de usuarios.
+- Validacao de dados do tutor e do animal.
+- Consulta das condicoes climaticas por CEP.
+- Bloqueio de passeios em caso de chuva ou calor excessivo.
+- Inicio, pausa, continuidade e finalizacao de passeios.
+- Registro de horario de inicio e termino.
+- Historico detalhado dos passeios.
+- Calculo e exibicao de calorias gastas.
+- Grafico com o resumo dos passeios.
 
-Certifique-se de ter o **Node.js 20+** (ou 22+) e o **npm** instalados no computador.
+## Requisitos
 
-```bash
-# 1. Acesse a pasta do projeto
-cd passeieau
+- Node.js 20 ou superior
+- npm
+- k6, para os testes de desempenho
 
-# 2. Instale as dependências
+## Instalacao
 npm install
 ```
 
----
+## Executando o projeto
 
-## 3. Como executar
-
-### Modo de desenvolvimento (API REST + Frontend Vite integrados na porta 3000)
-
-```bash
 npm run dev
 ```
 
-### Modo de produção (build do frontend + servidor Express)
+A aplicacao sera disponivel em `http://localhost:3000`.
 
-```bash
+## Documentacao da API (Swagger)
+
+Com o servidor em execucao (`npm run dev`), acesse a interface interativa do Swagger em:
+
+`http://localhost:3000/docs` (tambem disponivel em `http://localhost:3000/api/docs`)
+
+A especificacao OpenAPI pode ser consultada em formato YAML por `http://localhost:3000/api/swagger.yaml` ou em JSON por `http://localhost:3000/api/openapi.json`. O arquivo-fonte da especificacao esta em [swagger.yaml](swagger.yaml).
+
+Para o ambiente de producao:
+
+
 npm run build
 npm start
 ```
 
-### Verificação de tipagem TypeScript
+## Scripts disponiveis
 
-```bash
-npm run lint
+| Comando | Descricao |
+|---|---|
+| `npm run dev` | Inicia o servidor em modo de desenvolvimento |
+| `npm run build` | Gera a versao de producao |
+| `npm start` | Inicia o servidor em modo de producao |
+| `npm run lint` | Executa a verificacao de tipos |
+| `npm test` | Executa os testes unitarios e de API |
+| `npm run cypress:open` | Abre a interface do Cypress |
+| `npm run cypress:run` | Executa os testes E2E no terminal |
+
+## Testes
+
+### Testes unitarios e de API
+
+```powershell
+npm test
 ```
 
----
+### Testes E2E
 
-## 4. Quais dados de teste estão incluídos
+Com a aplicacao em execucao:
 
-Ao iniciar o servidor, o banco de dados em memória cria automaticamente **3 usuários (tutores e pets)**, **3 produtos** e **4 passeios concluídos** iniciais:
+```powershell
+npm run cypress:run
+```
 
-### Usuários pré-cadastrados (3)
+Para abrir o Cypress em modo visual:
 
+<<<<<<< HEAD
 | Tutor | E-mail (Login) | Senha | Cachorro | CEP | Cenário Climático Típico |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | Ana  | `ana@passeieau.com` | `corgi123` | Biscoito | `01310-100` (São Paulo, SP) | Clima ameno — passeio liberado |
@@ -68,33 +98,60 @@ Ao iniciar o servidor, o banco de dados em memória cria automaticamente **3 usu
 | Carla Souza | `carla@passeieau.com` | `chuva123` | Pudim | `80010-000` (Curitiba, PR) | Previsão de chuva (fallback) — bloqueia início do passeio |
 
 ---
+=======
+```powershell
+npm run cypress:open
+```
 
-## 5. Quais são as regras de negócio
+### Testes de desempenho com K6
 
-1. **Bloqueio preventivo por tempo chuvoso**: Ao tentar iniciar um passeio (`POST /api/passeio`), o backend consulta o clima do CEP do tutor. Se houver chuva prevista (`hasRain === true`), o sistema exibe os cuidados de proteção contra hipotermia, pisos escorregadios, trovoadas e umidade e bloqueia o início com status `403 Forbidden`.
-2. **Faixas de cuidado térmico (26 °C a 28 °C e 29 °C acima)**:
-   - **26 °C a 28 °C**: Exibe o aviso **Atenção redobrada** orientando rotas na sombra, ritmo leve, água fresca e evitar passeios entre 9h e 16h, mantendo o passeio liberado.
-   - **29 °C ou acima**: Classifica como **Calor excessivo** e bloqueia preventivamente o início do passeio (`403 Forbidden`) para evitar hipertermia severa e queimaduras nas patas.
-3. **Acesso protegido por autenticação**: Apenas tutores autenticados com token `Authorization: Bearer <token>` podem iniciar passeios, finalizar passeios ou consultar o próprio histórico.
-4. **Cálculo de gasto calórico**: Na finalização (`POST /api/finalizacao`), a API calcula o gasto calórico estimado do tutor à taxa de `4,2 kcal/min` a partir da duração em segundos informada.
-5. **Isolamento de histórico por tutor**: Cada tutor visualiza exclusivamente os passeios vinculados ao seu `_id`.
-6. **Validação de cadastro e senha**: E-mails duplicados são rejeitados (`409 Conflict`), senhas exigem no mínimo 4 caracteres e são armazenadas com hash `scrypt` + salt aleatório.
+Com a aplicacao em execucao:
 
----
+$env:K6_WEB_DASHBOARD="true"
+$env:K6_WEB_DASHBOARD_EXPORT="html-report.html"
+k6 
+run ./cypres/performece/passeio_test.js
+>>>>>>> 00b2a1b (Primeiro commit)
 
-## 6. Quais são as URLs importantes para acessar a aplicação
+O teste valida o endpoint `/api/health` e gera o relatorio `html-report.html`.
 
-Com a aplicação em execução na porta `3000`:
+## Regras de negocio
 
-- **Site Web (Frontend)**: `http://localhost:3000/`
-- **Documentação Swagger UI (renderizando o YAML)**: `http://localhost:3000/docs` ou `http://localhost:3000/api/docs`
-- **Arquivo OpenAPI YAML bruto**: `http://localhost:3000/api/swagger.yaml`
-- **Healthcheck da API e Banco em Memória**: `http://localhost:3000/api/health`
-- **Login (POST)**: `http://localhost:3000/api/login`
-- **Cadastro (POST)**: `http://localhost:3000/api/cadastro`
-- **Passeio — Iniciar (POST, Bearer)**: `http://localhost:3000/api/passeio`
-- **Finalização — Encerrar passeio (POST, Bearer)**: `http://localhost:3000/api/finalizacao`
-- **Finalização — Histórico e calorias (GET, Bearer)**: `http://localhost:3000/api/finalizacao`
-- **Produtos (GET)**: `http://localhost:3000/api/produtos`
-- **Usuários públicos (GET)**: `http://localhost:3000/api/usuarios`
-- **Clima por CEP (GET)**: `http://localhost:3000/api/clima/01310-100`
+### RN01 - Login e autenticacao
+O sistema permite o acesso somente com e-mail e senha validos. Credenciais incorretas devem apresentar uma mensagem de erro e impedir o acesso.
+
+### RN02 - Cadastro de usuario
+O cadastro somente deve ser realizado quando todos os campos obrigatorios estiverem preenchidos corretamente. O CEP informado deve ser valido e seguir o formato esperado.
+
+### RN03 - Validacao do clima - chuva
+Antes de permitir o passeio, o sistema consulta as condicoes climaticas. Caso seja identificada previsao de chuva, o passeio deve ser bloqueado preventivamente e uma mensagem deve ser apresentada ao usuario.
+
+### RN04 - Validacao da temperatura
+O sistema bloqueia passeios quando a temperatura estiver acima de 27 °C no periodo das 9h as 16h.
+### RN05 - Inicio do passeio
+O sistema permite iniciar um passeio somente apos as validacoes de autenticacao, cadastro e clima serem aprovadas. O horario de inicio deve ser registrado.
+
+### RN06 - Finalizacao do passeio - Historico
+O sistema permite finalizar um passeio iniciado, registrando o horario de termino e atualizando o status para finalizado.
+
+### RN07 - Historico de passeios
+O sistema disponibiliza o bloqueio da alta temperatura,então o tutor não consegue inicar o passeio com seu pet , ele mostra alerta. 
+
+## Estrutura principal
+
+```text
+src/
+  components/
+  pages/
+test/
+cypress/
+  e2e/
+  performece/
+  support/
+server.ts
+documentacao.Md
+```
+
+## Documentacao adicional
+- Regras de negocio e casos de teste: [documentacao.Md](documentacao.Md)
+- Relatorio de desempenho: [html-report.html](html-report.html)

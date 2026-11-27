@@ -197,6 +197,8 @@ export const WalkSummaryPage: React.FC<WalkSummaryPageProps> = ({
               <thead>
                 <tr className="border-b border-slate-200 text-xs font-medium text-slate-500">
                   <th className="py-3 pr-4">Data / Início</th>
+                  <th className="py-3 px-4">Término</th>
+                  <th className="py-3 px-4">Status</th>
                   <th className="py-3 px-4">Tutor</th>
                   <th className="py-3 px-4">Pet</th>
                   <th className="py-3 px-4">CEP &amp; Clima</th>
@@ -214,6 +216,14 @@ export const WalkSummaryPage: React.FC<WalkSummaryPageProps> = ({
                     >
                       <td className="py-3 pr-4 font-mono text-xs text-slate-700 tabular-nums whitespace-nowrap">
                         {formatDateTimeBr(walk.startedAt)}
+                      </td>
+                      <td className="py-3 px-4 font-mono text-xs text-slate-700 tabular-nums whitespace-nowrap">
+                        {walk.finishedAt ? formatDateTimeBr(walk.finishedAt) : '—'}
+                      </td>
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                          {walk.status === 'completed' ? 'Finalizado' : 'Em andamento'}
+                        </span>
                       </td>
                       <td className="py-3 px-4 font-medium text-slate-800 whitespace-nowrap">
                         {walk.tutorName || user.tutorName}

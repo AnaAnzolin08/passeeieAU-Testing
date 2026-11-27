@@ -1,0 +1,19 @@
+{
+  "ana": {
+    "login": "ana@passeieau.com",
+    "password": "corgi123"
+  },
+  "bruno": {
+    "login": "bruno@passeieau.com",
+    "password": "passeio123"
+  },
+  "carla": {
+    "login": "carla@passeieau.com",
+    "password": "chuva123"
+  },
+  "invalido401": {
+    "login": "ana@passeieau.com",
+    "password": "senha-errada"
+  },
+  "erroEsperado": "E-mail ou senha inválidos."
+}

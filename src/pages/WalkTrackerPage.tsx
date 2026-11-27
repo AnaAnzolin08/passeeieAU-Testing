@@ -194,7 +194,7 @@ export const WalkTrackerPage: React.FC<WalkTrackerPageProps> = ({
                 <span>
                   {weather.hasRain
                     ? 'Tempo chuvoso — Passeio bloqueado preventivamente'
-                    : `Calor excessivo (${weather.temperatureC}°C · ≥ 29°C) — Passeio bloqueado`}
+                    : `Calor acima de 27°C entre 9h e 16h (${weather.temperatureC}°C) — Passeio bloqueado`}
                 </span>
               </div>
               <p className="text-sm leading-relaxed text-red-800">
@@ -224,7 +224,7 @@ export const WalkTrackerPage: React.FC<WalkTrackerPageProps> = ({
                   />
                   <div className="space-y-1">
                     <p className="font-display text-sm font-bold text-amber-950">
-                      Atenção redobrada: {weather.temperatureC}°C (faixa 26°C a 28°C)
+                      Atenção redobrada: {weather.temperatureC}°C (fora do horário de bloqueio)
                     </p>
                     <p className="text-xs leading-relaxed text-amber-900">
                       {weather.heatWarning}

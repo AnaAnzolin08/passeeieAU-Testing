@@ -4,18 +4,68 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PasseieAu — Passeio Seguro &amp; Monitoramento Pet</title>
-    <meta name="description" content="Plataforma web e API REST para passeios seguros com cachorro, alertas climáticos por CEP, monitoramento de duração e gasto calórico." />
+    <meta
+      name="description"
+      content="Plataforma web e API REST para passeios seguros com cachorro, alertas climáticos por CEP, monitoramento de duração e gasto calórico."
+    />
     <meta property="og:title" content="PasseieAu — Passeio Seguro &amp; Monitoramento Pet" />
-    <meta property="og:description" content="Plataforma web e API REST para passeios seguros com cachorro Corgi, alertas climáticos por CEP, monitoramento de duração e gasto calórico." />
+    <meta
+      property="og:description"
+      content="Plataforma web e API REST para passeios seguros com cachorro Corgi, alertas climáticos por CEP, monitoramento de duração e gasto calórico."
+    />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      a[href*="swagger"],
+      a[href*="/docs"] {
+        display: none !important;
+      }
+    </style>
   </head>
   <body class="bg-slate-50 text-slate-900 antialiased selection:bg-amber-200 selection:text-slate-900">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      (function () {
+        const alvosExatos = [
+          'acesso rápido com perfis de exemplo:',
+          'acesso rápido com perfis de exemplo',
+          'ana · são paulo',
+          'bruno · salvador',
+          'carla · curitiba',
+          'swagger api docs',
+          'swagger.yaml'
+        ];
+
+        function limparItensEspecificos() {
+          document.querySelectorAll('a').forEach((link) => {
+            const href = (link.getAttribute('href') || '').toLowerCase();
+            const txt = (link.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+            if (href.includes('swagger') || href.includes('/docs') || txt.includes('swagger') || txt === 'swagger.yaml') {
+              link.remove();
+            }
+          });
+
+          document.querySelectorAll('button, a, span, p').forEach((el) => {
+            if (el.children.length > 0) return;
+            const txt = (el.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+            if (alvosExatos.includes(txt)) {
+              el.remove();
+            }
+          });
+        }
+
+        const observer = new MutationObserver(limparItensEspecificos);
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+        window.addEventListener('DOMContentLoaded', limparItensEspecificos);
+      })();
+    </script>
   </body>
 </html>
 

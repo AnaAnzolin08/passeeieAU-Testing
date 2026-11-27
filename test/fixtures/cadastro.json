@@ -1,0 +1,22 @@
+{
+  "valido": {
+    "tutorName": "Maria Clara",
+    "login": "maria@passeieau.com",
+    "password": "senha123",
+    "dogName": "Bento",
+    "cep": "01310-100",
+    "dogPhoto": "/src/assets/images/corgi_avatar_biscoito_1795046208844.jpg"
+  },
+  "duplicado": {
+    "tutorName": "Ana",
+    "login": "ana@passeieau.com",
+    "password": "corgi123",
+    "dogName": "Biscoito",
+    "cep": "01310-100"
+  },
+  "camposAusentes400": {
+    "tutorName": "Sem Campos"
+  },
+  "erroCamposAusentes": "Preencha todos os campos obrigatórios: tutorName, login, password, dogName e cep.",
+  "erroDuplicado409": "Este login já está em uso."
+}

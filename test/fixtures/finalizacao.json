@@ -1,0 +1,12 @@
+{
+  "valido": {
+    "durationSeconds": 1500
+  },
+  "invalido": {
+    "durationSeconds": 0
+  },
+  "caloriasEsperadas": 105,
+  "statusEsperado": "completed",
+  "erroDuracao400": "Informe uma duração inteira válida em segundos (>= 1).",
+  "erroSemToken401": "Token de autenticação ausente."
+}

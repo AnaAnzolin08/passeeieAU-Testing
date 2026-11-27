@@ -49,7 +49,7 @@ export const apiClient = {
   },
 
   login(login: string, password: string): Promise<AuthResponse> {
-    return requestJson<AuthResponse>('/api/login', {
+    return requestJson<AuthResponse>('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify({ login, password }),
     });
@@ -62,8 +62,8 @@ export const apiClient = {
     dogName: string;
     cep: string;
     dogPhoto: string;
-  }): Promise<AuthResponse> {
-    return requestJson<AuthResponse>('/api/cadastro', {
+  }): Promise<{ user: UserPublic }> {
+    return requestJson<{ user: UserPublic }>('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
